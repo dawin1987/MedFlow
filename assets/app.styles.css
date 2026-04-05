@@ -384,7 +384,7 @@ Specificity: (0,2,0)
     .app-header {
         width: var(--sidebar-w);
         transform: translateX(calc(-1 * var(--sidebar-w)));
-        padding: 3px 20px 27px;
+        padding: 3px 20px 57px;
     }
     body.sidebar-open .app-header {
         transform: translateX(0);
