@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KuraDoc — Planes y Costos</title>
+<link rel="stylesheet" href="navbar.css">
+<style>
+html { scroll-behavior:smooth; }
+body { margin:0; background:#f7faff; font-family:'Inter',sans-serif; color:#1a2540; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);} }
+.reveal { opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease; }
+.reveal.visible { opacity:1;transform:translateY(0); }
+
+.page-hero {
+  background:linear-gradient(135deg,#0b1f3a,#0a3272);
+  padding:80px 32px 70px;text-align:center;color:white;
+}
+.page-hero-label { font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#4ecdc4;margin-bottom:14px; }
+.page-hero h1 { font-family:'Sora',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:900;letter-spacing:-1px;margin-bottom:14px; }
+.page-hero p  { font-size:16px;opacity:.75;max-width:540px;margin:0 auto;line-height:1.7; }
+
+/* PLANS */
+.plans-section { padding:80px 32px; max-width:1100px;margin:0 auto; }
+.plans-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:24px;
+  margin-bottom:60px;
+}
+.plan-card {
+  background:white;
+  border-radius:22px;
+  border:2px solid #e8f0fe;
+  padding:32px 28px;
+  position:relative;
+  transition:transform .25s,box-shadow .25s;
+  box-shadow:0 4px 20px rgba(10,92,245,.06);
+}
+.plan-card:hover { transform:translateY(-6px);box-shadow:0 16px 48px rgba(10,92,245,.14); }
+.plan-card.popular {
+  border-color:#0a5cf5;
+  background:linear-gradient(135deg,#0b1f3a 0%,#0a3272 100%);
+  color:white;
+}
+.popular-badge {
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,#0a5cf5,#00c4a0);
+  color:white;font-size:11px;font-weight:800;
+  padding:5px 16px;border-radius:20px;letter-spacing:.5px;
+  text-transform:uppercase;white-space:nowrap;
+}
+.plan-icon { font-size:42px;margin-bottom:14px;line-height:1; }
+.plan-name { font-family:'Sora',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px; }
+.plan-card.popular .plan-name { color:white; }
+.plan-desc { font-size:13px;color:#607080;margin-bottom:22px;line-height:1.6; }
+.plan-card.popular .plan-desc { color:rgba(255,255,255,.65); }
+.plan-price { display:flex;align-items:baseline;gap:4px;margin-bottom:24px; }
+.plan-price .currency { font-size:18px;font-weight:700;color:#0a5cf5; }
+.plan-card.popular .plan-price .currency { color:#4ecdc4; }
+.plan-price .amount { font-family:'Sora',sans-serif;font-size:48px;font-weight:900;color:#0b1f3a;line-height:1; }
+.plan-card.popular .plan-price .amount { color:white; }
+.plan-price .period { font-size:14px;color:#607080; }
+.plan-card.popular .plan-price .period { color:rgba(255,255,255,.6); }
+.plan-price-note { font-size:11px;color:#94a3b8;margin-top:-16px;margin-bottom:22px; }
+.plan-card.popular .plan-price-note { color:rgba(255,255,255,.5); }
+.plan-features { list-style:none;padding:0;display:flex;flex-direction:column;gap:9px;margin-bottom:28px; }
+.plan-features li { font-size:13px;display:flex;align-items:center;gap:9px;color:#374151; }
+.plan-card.popular .plan-features li { color:rgba(255,255,255,.85); }
+.plan-features li .check { color:#10b981;font-size:15px;flex-shrink:0; }
+.plan-card.popular .plan-features li .check { color:#4ecdc4; }
+.plan-features li .cross { color:#d1d5db;font-size:15px;flex-shrink:0; }
+.plan-btn {
+  display:block;width:100%;padding:13px;
+  text-align:center;border-radius:12px;
+  font-family:'Inter',sans-serif;font-weight:700;font-size:14px;
+  text-decoration:none;cursor:pointer;border:none;
+  transition:opacity .2s,transform .15s;
+}
+.plan-btn-outline { background:transparent;color:#0a5cf5;border:2px solid #0a5cf5; }
+.plan-btn-outline:hover { background:#e8f0fe; }
+.plan-btn-main { background:linear-gradient(135deg,#0a5cf5,#00c4a0);color:white;box-shadow:0 6px 20px rgba(10,92,245,.35); }
+.plan-btn-main:hover { opacity:.9;transform:translateY(-1px); }
+.plan-btn-light { background:rgba(255,255,255,.15);color:white;border:1.5px solid rgba(255,255,255,.35); }
+.plan-btn-light:hover { background:rgba(255,255,255,.25); }
+
+/* CUSTOM QUOTE */
+.quote-card {
+  background:linear-gradient(135deg,#0b1f3a,#0a3272);
+  border-radius:22px;padding:44px;text-align:center;color:white;
+  margin-bottom:40px;
+}
+.quote-card h3 { font-family:'Sora',sans-serif;font-size:26px;font-weight:800;margin-bottom:12px; }
+.quote-card p  { font-size:15px;opacity:.8;max-width:500px;margin:0 auto 28px;line-height:1.7; }
+.quote-card a {
+  display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,#0a5cf5,#00c4a0);
+  color:white;padding:14px 30px;border-radius:12px;
+  font-weight:700;font-size:15px;text-decoration:none;
+  box-shadow:0 6px 20px rgba(10,92,245,.4);
+  transition:transform .2s;
+}
+.quote-card a:hover { transform:translateY(-2px); }
+
+/* COMPARISON TABLE */
+.compare-section { padding:0 32px 80px;max-width:1100px;margin:0 auto; }
+.compare-section h2 { font-family:'Sora',sans-serif;font-size:24px;font-weight:800;text-align:center;margin-bottom:28px;color:#0b1f3a; }
+.compare-table { width:100%;border-collapse:collapse;background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(10,92,245,.07); }
+.compare-table th { background:#0b1f3a;color:white;padding:14px 18px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;text-align:left; }
+.compare-table th:not(:first-child) { text-align:center; }
+.compare-table td { padding:13px 18px;border-bottom:1px solid #f0f4f8;font-size:14px;color:#374151; }
+.compare-table td:not(:first-child) { text-align:center; }
+.compare-table tr:last-child td { border-bottom:none; }
+.compare-table tr:nth-child(even) td { background:#f9fbff; }
+.chk { color:#10b981;font-size:17px; }
+.xmark { color:#d1d5db;font-size:17px; }
+
+@media(max-width:700px){
+  .compare-table { font-size:12px; }
+  .compare-table td,.compare-table th { padding:10px 10px; }
+}
+</style>
+</head>
+<body>
+<nav id="kd-navbar"></nav>
+<div id="kd-mobile-menu" class="kd-mobile-menu"></div>
+
+<div style="padding-top:64px;">
+  <div class="page-hero">
+    <div class="page-hero-label">Precios</div>
+    <h1>Planes diseñados para crecer contigo</h1>
+    <p>Elige el plan que mejor se adapte a tu práctica médica. Sin contratos anuales. Sin sorpresas.</p>
+  </div>
+
+  <div class="plans-section">
+    <div class="plans-grid">
+
+      <!-- Básico -->
+      <div class="plan-card reveal">
+        <div class="plan-icon">🌱</div>
+        <div class="plan-name">Básico</div>
+        <div class="plan-desc">Para médicos independientes que inician su transformación digital.</div>
+        <div class="plan-price">
+          <span class="currency">RD$</span>
+          <span class="amount">0</span>
+          <span class="period">/mes</span>
+        </div>
+        <div class="plan-price-note">Gratis para siempre · Sin tarjeta</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 1 médico</li>
+          <li><span class="check">✓</span> Hasta 50 pacientes</li>
+          <li><span class="check">✓</span> Agenda de citas</li>
+          <li><span class="check">✓</span> Expediente básico</li>
+          <li><span class="cross">✗</span> Recetas electrónicas</li>
+          <li><span class="cross">✗</span> Módulo financiero</li>
+          <li><span class="cross">✗</span> Notificaciones WhatsApp</li>
+        </ul>
+        <a href="index.html" class="plan-btn plan-btn-outline">Empezar gratis</a>
+      </div>
+
+      <!-- Profesional (destacado) -->
+      <div class="plan-card popular reveal">
+        <div class="popular-badge">⭐ Más popular</div>
+        <div class="plan-icon">🏥</div>
+        <div class="plan-name">Profesional</div>
+        <div class="plan-desc">La solución completa para consultorios y clínicas en crecimiento.</div>
+        <div class="plan-price">
+          <span class="currency">RD$</span>
+          <span class="amount">2,500</span>
+          <span class="period">/mes</span>
+        </div>
+        <div class="plan-price-note">Aprox. US$42 · Facturación mensual</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> Hasta 5 médicos</li>
+          <li><span class="check">✓</span> Pacientes ilimitados</li>
+          <li><span class="check">✓</span> Agenda avanzada + turnos</li>
+          <li><span class="check">✓</span> Expediente digital completo</li>
+          <li><span class="check">✓</span> Recetas electrónicas</li>
+          <li><span class="check">✓</span> Módulo financiero</li>
+          <li><span class="check">✓</span> Notificaciones WhatsApp</li>
+        </ul>
+        <a href="https://wa.me/18098035825" target="_blank" class="plan-btn plan-btn-main">Contactar para activar</a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="plan-card reveal">
+        <div class="plan-icon">🏢</div>
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-desc">Para redes de clínicas, hospitales y centros médicos de gran escala.</div>
+        <div class="plan-price">
+          <span class="amount" style="font-size:32px;color:#0b1f3a;">Cotizar</span>
+        </div>
+        <div class="plan-price-note">Precio personalizado según requerimientos</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> Médicos ilimitados</li>
+          <li><span class="check">✓</span> Multi-sucursal</li>
+          <li><span class="check">✓</span> Todo el módulo Profesional</li>
+          <li><span class="check">✓</span> Soporte prioritario</li>
+          <li><span class="check">✓</span> Capacitación incluida</li>
+          <li><span class="check">✓</span> Integración personalizada</li>
+          <li><span class="check">✓</span> SLA garantizado</li>
+        </ul>
+        <a href="https://wa.me/18098035825" target="_blank" class="plan-btn plan-btn-outline">Solicitar cotización</a>
+      </div>
+
+    </div>
+
+    <!-- Quote banner -->
+    <div class="quote-card reveal">
+      <h3>¿No estás seguro qué plan necesitas?</h3>
+      <p>Habla con nuestro equipo y te ayudamos a encontrar la solución perfecta para tu práctica médica, sin compromisos.</p>
+      <a href="https://wa.me/18098035825" target="_blank">💬 Hablar con un asesor por WhatsApp</a>
+    </div>
+  </div>
+
+  <!-- Comparison table -->
+  <div class="compare-section reveal">
+    <h2>Comparativa detallada de planes</h2>
+    <table class="compare-table">
+      <tr>
+        <th>Funcionalidad</th>
+        <th>Básico</th>
+        <th>Profesional</th>
+        <th>Enterprise</th>
+      </tr>
+      <tr><td>Médicos incluidos</td><td>1</td><td>Hasta 5</td><td>Ilimitados</td></tr>
+      <tr><td>Pacientes</td><td>Hasta 50</td><td>Ilimitados</td><td>Ilimitados</td></tr>
+      <tr><td>Agenda de citas</td><td><span class="chk">✓</span></td><td><span class="chk">✓</span></td><td><span class="chk">✓</span></td></tr>
+      <tr><td>Gestión de turnos y sala de espera</td><td><span class="xmark">✗</span></td><td><span class="chk">✓</span></td><td><span class="chk">✓</span></td></tr>
+      <tr><td>Expediente clínico digital</td><td>Básico</td><td>Completo</td><td>Completo</td></tr>
+      <tr><td>Recetas electrónicas</td><td><span class="xmark">✗</span></td><td><span class="chk">✓</span></td><td><span class="chk">✓</span></td></tr>
+      <tr><td>Analíticas y estudios</td><td><span class="xmark">✗</span></td><td><span class="chk">✓</span></td><td><span class="chk">✓</span></td></tr>
+      <tr><td>Módulo financiero</td><td><span class="xmark">✗</span></td><td><span class="chk">✓</span></td><td><span class="chk">✓</span></td></tr>
+      <tr><td>Notificaciones WhatsApp</td><td><span class="xmark">✗</span></td><td><span class="chk">✓</span></td><td><span class="chk">✓</span></td></tr>
+      <tr><td>Módulo de secretaría</td><td><span class="xmark">✗</span></td><td><span class="chk">✓</span></td><td><span class="chk">✓</span></td></tr>
+      <tr><td>Multi-sucursal</td><td><span class="xmark">✗</span></td><td><span class="xmark">✗</span></td><td><span class="chk">✓</span></td></tr>
+      <tr><td>Soporte prioritario</td><td><span class="xmark">✗</span></td><td><span class="xmark">✗</span></td><td><span class="chk">✓</span></td></tr>
+    </table>
+  </div>
+
+</div>
+
+<footer class="kd-footer">
+  <p>© 2026 KuraDoc · <a href="terminos.html">Términos</a> · <a href="privacidad.html">Privacidad</a></p>
+</footer>
+
+<script src="navbar.js"></script>
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

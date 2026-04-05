@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KuraDoc — Contacto</title>
+<link rel="stylesheet" href="navbar.css">
+<style>
+html { scroll-behavior:smooth; }
+body { margin:0; background:#f7faff; font-family:'Inter',sans-serif; color:#1a2540; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);} }
+.reveal { opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease; }
+.reveal.visible { opacity:1;transform:translateY(0); }
+
+.page-hero {
+  background:linear-gradient(135deg,#0b1f3a,#0a3272);
+  padding:80px 32px 70px;text-align:center;color:white;
+}
+.page-hero-label { font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#4ecdc4;margin-bottom:14px; }
+.page-hero h1 { font-family:'Sora',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:900;letter-spacing:-1px;margin-bottom:14px; }
+.page-hero p  { font-size:16px;opacity:.75;max-width:520px;margin:0 auto;line-height:1.7; }
+
+.contact-section {
+  max-width:1040px;margin:0 auto;
+  padding:70px 24px 80px;
+  display:grid;grid-template-columns:1fr 1.3fr;
+  gap:40px;align-items:start;
+}
+
+/* LEFT — info */
+.contact-info-col {}
+.contact-name-card {
+  background:linear-gradient(135deg,#0b1f3a,#0a3272);
+  border-radius:20px;padding:28px;color:white;margin-bottom:22px;
+}
+.contact-name-avatar {
+  width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,#0a5cf5,#00c4a0);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;margin-bottom:14px;
+}
+.contact-name-card h3 { font-family:'Sora',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px; }
+.contact-name-card p  { font-size:13px;opacity:.7; }
+
+/* WhatsApp CTA — big */
+.wa-cta {
+  display:flex;align-items:center;gap:14px;
+  background:#25d366;
+  border-radius:16px;padding:20px 22px;color:white;
+  text-decoration:none;margin-bottom:20px;
+  transition:transform .2s,box-shadow .2s;
+  box-shadow:0 6px 22px rgba(37,211,102,.35);
+}
+.wa-cta:hover { transform:translateY(-3px);box-shadow:0 12px 32px rgba(37,211,102,.45); }
+.wa-icon { font-size:40px;flex-shrink:0; }
+.wa-text h4 { font-family:'Sora',sans-serif;font-size:17px;font-weight:800;margin-bottom:3px; }
+.wa-text p  { font-size:13px;opacity:.9;line-height:1.4; }
+
+/* Info items */
+.contact-items { display:flex;flex-direction:column;gap:12px;margin-bottom:22px; }
+.contact-item {
+  background:white;border:1px solid #e8f0fe;border-radius:12px;
+  padding:14px 16px;display:flex;align-items:center;gap:12px;
+  box-shadow:0 2px 8px rgba(10,92,245,.05);
+}
+.contact-item-icon { font-size:24px;flex-shrink:0; }
+.contact-item-body h5 { font-size:12px;font-weight:700;color:#607080;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px; }
+.contact-item-body p  { font-size:14px;font-weight:600;color:#0b1f3a; }
+.contact-item-body a  { color:#0a5cf5;text-decoration:none; }
+.contact-item-body a:hover { text-decoration:underline; }
+
+/* Social */
+.social-title { font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#607080;margin-bottom:10px; }
+.social-row { display:flex;gap:10px;flex-wrap:wrap; }
+.social-btn {
+  width:42px;height:42px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;text-decoration:none;
+  transition:transform .2s,box-shadow .2s;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+.social-btn:hover { transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.15); }
+
+/* RIGHT — form */
+.contact-form-col {
+  background:white;border-radius:22px;
+  border:1px solid #e8f0fe;
+  padding:36px 32px;
+  box-shadow:0 4px 24px rgba(10,92,245,.07);
+}
+.contact-form-col h2 { font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#0b1f3a;margin-bottom:6px; }
+.contact-form-col p  { font-size:14px;color:#607080;margin-bottom:28px;line-height:1.6; }
+.cf-group { margin-bottom:16px; }
+.cf-label { display:block;font-size:12px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px; }
+.cf-input, .cf-select, .cf-textarea {
+  width:100%;padding:11px 14px;
+  border:1.5px solid #e2e8f0;border-radius:10px;
+  font-family:'Inter',sans-serif;font-size:14px;color:#1a2540;
+  background:white;
+  transition:border-color .2s,box-shadow .2s;
+  box-sizing:border-box;
+}
+.cf-input:focus,.cf-select:focus,.cf-textarea:focus {
+  outline:none;border-color:#0a5cf5;
+  box-shadow:0 0 0 3px rgba(10,92,245,.1);
+}
+.cf-textarea { resize:vertical;min-height:120px; }
+.cf-submit {
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,#0a5cf5,#0847c8);
+  color:white;border:none;border-radius:12px;
+  font-family:'Sora',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;
+  box-shadow:0 6px 20px rgba(10,92,245,.35);
+  transition:opacity .2s,transform .15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:6px;
+}
+.cf-submit:hover { opacity:.9;transform:translateY(-1px); }
+.cf-note { font-size:12px;color:#94a3b8;text-align:center;margin-top:12px; }
+
+/* Success message */
+.cf-success {
+  display:none;background:#f0fdf4;border:1px solid #86efac;
+  border-radius:12px;padding:20px;text-align:center;
+  color:#166534;font-weight:600;font-size:14px;margin-top:16px;
+}
+
+@media(max-width:800px){
+  .contact-section { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<nav id="kd-navbar"></nav>
+<div id="kd-mobile-menu" class="kd-mobile-menu"></div>
+
+<div style="padding-top:64px;">
+  <div class="page-hero">
+    <div class="page-hero-label">Contacto</div>
+    <h1>Estamos aquí para ayudarte</h1>
+    <p>¿Tienes dudas o quieres activar tu cuenta? Escríbenos y te respondemos rápido.</p>
+  </div>
+
+  <div class="contact-section">
+
+    <!-- LEFT -->
+    <div class="contact-info-col reveal">
+      <div class="contact-name-card">
+        <div class="contact-name-avatar">👨‍💼</div>
+        <h3>Dawin Almanzar Rojas</h3>
+        <p>Representante · KuraDoc</p>
+      </div>
+
+      <!-- WhatsApp grande -->
+      <a href="https://wa.me/18098035825" target="_blank" class="wa-cta">
+        <div class="wa-icon">💬</div>
+        <div class="wa-text">
+          <h4>Escríbenos por WhatsApp</h4>
+          <p>Respuesta rápida · +1 (809) 803-5825</p>
+        </div>
+      </a>
+
+      <div class="contact-items">
+        <div class="contact-item">
+          <div class="contact-item-icon">📞</div>
+          <div class="contact-item-body">
+            <h5>Teléfono</h5>
+            <p><a href="tel:+18098035825">+1 (809) 803-5825</a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">📧</div>
+          <div class="contact-item-body">
+            <h5>Correo electrónico</h5>
+            <p><a href="mailto:soporte@kuradoc.com">soporte@kuradoc.com</a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">🗺️</div>
+          <div class="contact-item-body">
+            <h5>Ubicación</h5>
+            <p>República Dominicana</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">🕐</div>
+          <div class="contact-item-body">
+            <h5>Horario de atención</h5>
+            <p>Lun–Vie: 8:00 AM – 6:00 PM (AST)</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="social-title">Síguenos en redes</div>
+      <div class="social-row">
+        <a href="#" class="social-btn" style="background:#1877f2;" title="Facebook">📘</a>
+        <a href="#" class="social-btn" style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);" title="Instagram">📸</a>
+        <a href="#" class="social-btn" style="background:#1da1f2;" title="Twitter/X">🐦</a>
+        <a href="#" class="social-btn" style="background:#0077b5;" title="LinkedIn">💼</a>
+        <a href="https://wa.me/18098035825" target="_blank" class="social-btn" style="background:#25d366;" title="WhatsApp">💬</a>
+      </div>
+    </div>
+
+    <!-- RIGHT — form -->
+    <div class="contact-form-col reveal">
+      <h2>Envíanos un mensaje</h2>
+      <p>Cuéntanos sobre tu consulta o clínica y cómo podemos ayudarte. Te respondemos pronto.</p>
+
+      <form id="contactForm" onsubmit="submitContactForm(event)" novalidate>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="cf-group">
+            <label class="cf-label" for="cf-nombre">Nombre *</label>
+            <input type="text" id="cf-nombre" class="cf-input" placeholder="Tu nombre completo" required>
+          </div>
+          <div class="cf-group">
+            <label class="cf-label" for="cf-telefono">Teléfono</label>
+            <input type="tel" id="cf-telefono" class="cf-input" placeholder="809-000-0000">
+          </div>
+        </div>
+        <div class="cf-group">
+          <label class="cf-label" for="cf-email">Correo electrónico *</label>
+          <input type="email" id="cf-email" class="cf-input" placeholder="tu@correo.com" required>
+        </div>
+        <div class="cf-group">
+          <label class="cf-label" for="cf-tipo">¿En qué podemos ayudarte?</label>
+          <select id="cf-tipo" class="cf-select">
+            <option value="">— Selecciona una opción —</option>
+            <option>Información sobre planes y costos</option>
+            <option>Soporte técnico</option>
+            <option>Activar mi cuenta</option>
+            <option>Demo del sistema</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="cf-group">
+          <label class="cf-label" for="cf-mensaje">Mensaje *</label>
+          <textarea id="cf-mensaje" class="cf-textarea" placeholder="Cuéntanos sobre tu consulta, clínica o lo que necesites..." required></textarea>
+        </div>
+        <button type="submit" class="cf-submit">
+          <span>📨</span> Enviar mensaje
+        </button>
+        <div id="cf-success" class="cf-success">
+          ✅ ¡Mensaje enviado! Nos comunicaremos contigo muy pronto.
+        </div>
+        <p class="cf-note">También puedes escribirnos directamente por WhatsApp para una respuesta más rápida.</p>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<footer class="kd-footer">
+  <p>© 2026 KuraDoc · <a href="terminos.html">Términos</a> · <a href="privacidad.html">Privacidad</a></p>
+</footer>
+
+<script src="navbar.js"></script>
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+function submitContactForm(e) {
+  e.preventDefault();
+  const nombre  = document.getElementById('cf-nombre').value.trim();
+  const email   = document.getElementById('cf-email').value.trim();
+  const mensaje = document.getElementById('cf-mensaje').value.trim();
+  if (!nombre || !email || !mensaje) {
+    alert('Por favor completa los campos obligatorios (Nombre, Correo y Mensaje).');
+    return;
+  }
+  // Visual feedback (en producción conectar con backend/emailjs)
+  const btn = e.target.querySelector('.cf-submit');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Enviando...';
+  setTimeout(() => {
+    document.getElementById('cf-success').style.display = 'block';
+    btn.innerHTML = '✅ Mensaje enviado';
+    // Redirect to WhatsApp with pre-filled message
+    const msg = encodeURIComponent(`Hola Dawin, soy ${nombre} (${email}).\n\n${mensaje}`);
+    window.open(`https://wa.me/18098035825?text=${msg}`, '_blank');
+  }, 900);
+}
+</script>
+</body>
+</html>

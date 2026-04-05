@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KuraDoc — Características del sistema</title>
+<link rel="stylesheet" href="navbar.css">
+<style>
+html { scroll-behavior: smooth; }
+body { margin:0; background:#f7faff; font-family:'Inter',sans-serif; color:#1a2540; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);} }
+.reveal { opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* PAGE HERO */
+.page-hero {
+  background:linear-gradient(135deg,#0b1f3a,#0a3272);
+  padding:80px 32px 70px;
+  text-align:center;
+  color:white;
+}
+.page-hero-label { font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#4ecdc4;margin-bottom:14px; }
+.page-hero h1 { font-family:'Sora',sans-serif;font-size:clamp(28px,4vw,50px);font-weight:900;letter-spacing:-1px;margin-bottom:14px; }
+.page-hero p  { font-size:17px;opacity:.75;max-width:560px;margin:0 auto;line-height:1.7; }
+
+/* FEATURE GROUP */
+.features-section { padding:80px 32px; max-width:1100px;margin:0 auto; }
+.feat-group { margin-bottom:70px; }
+.feat-group-title {
+  font-family:'Sora',sans-serif;
+  font-size:20px;font-weight:800;
+  color:#0b1f3a;
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:28px;
+  padding-bottom:14px;
+  border-bottom:2px solid #e8f0fe;
+}
+.feat-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px; }
+.feat-card {
+  background:white;
+  border-radius:16px;
+  border:1px solid #e8f0fe;
+  padding:22px 20px;
+  box-shadow:0 2px 12px rgba(10,92,245,.05);
+  transition:transform .22s,box-shadow .22s;
+  display:flex;gap:14px;align-items:flex-start;
+}
+.feat-card:hover { transform:translateY(-4px);box-shadow:0 10px 32px rgba(10,92,245,.12); }
+.feat-card-icon {
+  width:44px;height:44px;flex-shrink:0;
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+}
+.feat-card-body h4 { font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#0b1f3a;margin-bottom:5px; }
+.feat-card-body p  { font-size:13px;color:#607080;line-height:1.6; }
+
+/* CTA BOTTOM */
+.bottom-cta {
+  background:linear-gradient(135deg,#0a5cf5,#00c4a0);
+  padding:60px 32px;text-align:center;color:white;
+}
+.bottom-cta h2 { font-family:'Sora',sans-serif;font-size:28px;font-weight:800;margin-bottom:12px; }
+.bottom-cta p  { font-size:15px;opacity:.85;margin-bottom:28px; }
+.bottom-cta a {
+  display:inline-flex;align-items:center;gap:8px;
+  background:white;color:#0a5cf5;
+  border-radius:12px;padding:13px 28px;
+  font-weight:700;text-decoration:none;font-size:15px;
+  transition:transform .2s;
+}
+.bottom-cta a:hover { transform:translateY(-2px); }
+</style>
+</head>
+<body>
+
+<nav id="kd-navbar"></nav>
+<div id="kd-mobile-menu" class="kd-mobile-menu"></div>
+
+<div style="padding-top:64px;">
+
+  <div class="page-hero">
+    <div class="page-hero-label">Funcionalidades</div>
+    <h1>Todo lo que KuraDoc puede hacer por ti</h1>
+    <p>Un ecosistema completo diseñado para que médicos, secretarias y pacientes trabajen de forma más inteligente.</p>
+  </div>
+
+  <div class="features-section">
+
+    <!-- Médico -->
+    <div class="feat-group reveal">
+      <div class="feat-group-title"><span>🩺</span> Módulo del Médico</div>
+      <div class="feat-grid">
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#e8f0fe;">📅</div>
+          <div class="feat-card-body"><h4>Agenda inteligente</h4><p>Visualiza y gestiona citas del día con control de turnos en tiempo real.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#e0fdf4;">📁</div>
+          <div class="feat-card-body"><h4>Expediente digital</h4><p>Historial clínico completo por paciente con toda la información médica unificada.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#fef9c3;">💊</div>
+          <div class="feat-card-body"><h4>Recetas electrónicas</h4><p>Genera y emite recetas digitales con medicamentos, dosis e instrucciones detalladas.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#fce7f3;">🧪</div>
+          <div class="feat-card-body"><h4>Analíticas y laboratorios</h4><p>Solicita y registra resultados de estudios de laboratorio e imágenes directamente en el expediente.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#ede9fe;">📊</div>
+          <div class="feat-card-body"><h4>Dashboard de estadísticas</h4><p>Visualiza métricas clave: citas, ingresos, tendencias y comparativas por período.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#dcfce7;">📢</div>
+          <div class="feat-card-body"><h4>Anuncios y comunicados</h4><p>Publica anuncios para tus pacientes directamente desde el panel del médico.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secretaria -->
+    <div class="feat-group reveal">
+      <div class="feat-group-title"><span>🗂️</span> Módulo de Secretaría</div>
+      <div class="feat-grid">
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#e8f0fe;">👥</div>
+          <div class="feat-card-body"><h4>Gestión de pacientes</h4><p>Registra, busca y administra el directorio completo de pacientes del consultorio.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#fef9c3;">📋</div>
+          <div class="feat-card-body"><h4>Control de sala de espera</h4><p>Visualiza y gestiona el orden de llegada y atención de pacientes en tiempo real.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#e0fdf4;">🎟️</div>
+          <div class="feat-card-body"><h4>Tickets de cita</h4><p>Genera tickets con QR, número de turno y datos de la cita para entregar al paciente.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#fce7f3;">🔢</div>
+          <div class="feat-card-body"><h4>Número de récord</h4><p>Asigna y gestiona números de récord únicos por paciente para identificación rápida.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#ede9fe;">💰</div>
+          <div class="feat-card-body"><h4>Módulo financiero</h4><p>Registro de pagos, cobros y generación de reportes de ingresos por período o médico.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#dcfce7;">🔔</div>
+          <div class="feat-card-body"><h4>Notificaciones WhatsApp</h4><p>Envía confirmaciones y recordatorios de citas directamente al WhatsApp del paciente.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paciente -->
+    <div class="feat-group reveal">
+      <div class="feat-group-title"><span>📱</span> Portal del Paciente</div>
+      <div class="feat-grid">
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#e8f0fe;">🗓️</div>
+          <div class="feat-card-body"><h4>Reserva de citas online</h4><p>Agenda citas con tu médico en cualquier momento del día, desde tu teléfono o computadora.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#e0fdf4;">📂</div>
+          <div class="feat-card-body"><h4>Mi historial médico</h4><p>Accede a tus consultas, diagnósticos y recetas anteriores en un solo lugar siempre disponible.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#fef9c3;">⭐</div>
+          <div class="feat-card-body"><h4>Médicos favoritos</h4><p>Guarda tus médicos favoritos y deja comentarios sobre tu experiencia de atención.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-icon" style="background:#fce7f3;">🔔</div>
+          <div class="feat-card-body"><h4>Recordatorios automáticos</h4><p>Recibe alertas antes de tu cita para que nunca olvides tu consulta médica programada.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-cta reveal">
+    <h2>¿Quieres verlo en acción?</h2>
+    <p>Accede al sistema y explora todas estas funcionalidades ahora mismo.</p>
+    <a href="index.html">🔐 Entrar al sistema</a>
+  </div>
+
+</div>
+
+<footer class="kd-footer">
+  <p>© 2026 KuraDoc · <a href="terminos.html">Términos</a> · <a href="privacidad.html">Privacidad</a></p>
+</footer>
+
+<script src="navbar.js"></script>
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

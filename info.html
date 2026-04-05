@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KuraDoc — La plataforma médica digital de hoy</title>
+<link rel="stylesheet" href="navbar.css">
+<style>
+/* ══════════════════════════════════════════════════════════
+   INFO.HTML — LANDING COMPLETA
+   ══════════════════════════════════════════════════════════ */
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #f7faff; font-family: 'Inter', sans-serif; color: #1a2540; overflow-x: hidden; }
+
+/* ── Animations ── */
+@keyframes fadeUp   { from { opacity:0; transform:translateY(32px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+@keyframes slideLeft{ from { opacity:0; transform:translateX(-28px); } to { opacity:1; transform:translateX(0); } }
+@keyframes slideRight{from { opacity:0; transform:translateX(28px); } to { opacity:1; transform:translateX(0); } }
+@keyframes float    { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+@keyframes pulse-ring{ 0%{box-shadow:0 0 0 0 rgba(10,92,245,.35);} 70%{box-shadow:0 0 0 18px rgba(10,92,245,0);} 100%{box-shadow:0 0 0 0 rgba(10,92,245,0);} }
+@keyframes gradMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+.reveal { opacity:0; transform:translateY(28px); transition: opacity .65s ease, transform .65s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* ════════════════════════════════
+   HERO
+   ════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  padding-top: 64px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0b1f3a 0%, #0a3272 50%, #055c8a 100%);
+  background-size: 300% 300%;
+  animation: gradMove 10s ease infinite;
+}
+
+/* Decorative blobs */
+.hero::before {
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(0,196,160,.18) 0%, transparent 55%),
+              radial-gradient(ellipse at 80% 20%, rgba(10,92,245,.25) 0%, transparent 50%),
+              radial-gradient(ellipse at 60% 80%, rgba(255,255,255,.06) 0%, transparent 45%);
+  pointer-events:none;
+}
+
+.hero-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 32px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Left — copy */
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.2);
+  color: #a8d5ff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  animation: fadeUp .7s .1s both;
+}
+.hero-title {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(32px, 4.5vw, 58px);
+  font-weight: 900;
+  color: white;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  margin-bottom: 20px;
+  animation: fadeUp .7s .2s both;
+}
+.hero-title em { font-style:normal; color: #4ecdc4; }
+.hero-sub {
+  font-size: 17px;
+  color: rgba(255,255,255,.75);
+  line-height: 1.7;
+  margin-bottom: 32px;
+  animation: fadeUp .7s .3s both;
+}
+.hero-ctas {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  animation: fadeUp .7s .4s both;
+}
+.hero-btn-main {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #0a5cf5, #00c4a0);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 28px rgba(10,92,245,.45);
+  transition: transform .2s, box-shadow .2s;
+  animation: pulse-ring 2.5s ease-in-out infinite;
+}
+.hero-btn-main:hover { transform:translateY(-2px); box-shadow:0 12px 36px rgba(10,92,245,.55); }
+.hero-btn-sec {
+  padding: 14px 28px;
+  background: rgba(255,255,255,.1);
+  color: white;
+  border: 1.5px solid rgba(255,255,255,.35);
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background .2s, border-color .2s;
+  backdrop-filter: blur(4px);
+}
+.hero-btn-sec:hover { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.6); }
+
+/* Badges below CTAs */
+.hero-badges {
+  display: flex;
+  gap: 20px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+  animation: fadeUp .7s .55s both;
+}
+.hero-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(255,255,255,.65);
+  font-weight: 500;
+}
+.hero-badge .dot { width:6px;height:6px;background:#4ecdc4;border-radius:50%; }
+
+/* Right — visual card */
+.hero-visual {
+  animation: float 5s ease-in-out infinite, fadeIn 1s .5s both;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.hero-card {
+  background: rgba(255,255,255,.1);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 20px;
+  padding: 20px 22px;
+  color: white;
+}
+.hero-card-header { display:flex;align-items:center;gap:12px;margin-bottom:14px; }
+.hero-card-icon { width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px; }
+.hero-card-title { font-family:'Sora',sans-serif;font-size:14px;font-weight:700; }
+.hero-card-sub   { font-size:12px;color:rgba(255,255,255,.6); }
+.hero-stat-row { display:flex;gap:16px; }
+.hero-stat { flex:1;background:rgba(255,255,255,.08);border-radius:10px;padding:10px;text-align:center; }
+.hero-stat-val { font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#4ecdc4; }
+.hero-stat-lbl { font-size:10px;color:rgba(255,255,255,.6);margin-top:2px; }
+.hero-mini-cards { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+.hero-mini-card  { background:rgba(255,255,255,.08);border-radius:12px;padding:12px;display:flex;align-items:center;gap:9px; }
+.hero-mini-card span:first-child { font-size:20px; }
+.hero-mini-card-txt { font-size:12px;font-weight:600; }
+
+/* ── SECTION: Dual audience ── */
+.dual-section {
+  padding: 80px 32px;
+  background: white;
+}
+.dual-section h2 {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(26px,3vw,40px);
+  font-weight: 800;
+  text-align: center;
+  color: #0b1f3a;
+  letter-spacing: -.5px;
+  margin-bottom: 12px;
+}
+.dual-section .sec-sub {
+  text-align: center;
+  color: #607080;
+  font-size: 16px;
+  max-width: 580px;
+  margin: 0 auto 52px;
+  line-height: 1.7;
+}
+.dual-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+.dual-card {
+  border-radius: 20px;
+  padding: 36px 32px;
+  position: relative;
+  overflow: hidden;
+}
+.dual-card.medico {
+  background: linear-gradient(135deg, #0b1f3a, #0a3272);
+  color: white;
+}
+.dual-card.paciente {
+  background: linear-gradient(135deg, #00796b, #00c4a0);
+  color: white;
+}
+.dual-card::after {
+  content:'';
+  position:absolute;
+  bottom:-30px;right:-30px;
+  width:120px;height:120px;
+  border-radius:50%;
+  background:rgba(255,255,255,.07);
+}
+.dual-card-badge {
+  display:inline-block;
+  background:rgba(255,255,255,.18);
+  font-size:11px;font-weight:700;
+  padding:5px 12px;border-radius:20px;
+  letter-spacing:.5px;text-transform:uppercase;
+  margin-bottom:16px;
+}
+.dual-card-icon { font-size:48px;margin-bottom:14px;line-height:1; }
+.dual-card h3 { font-family:'Sora',sans-serif;font-size:22px;font-weight:800;margin-bottom:10px; }
+.dual-card p  { font-size:14px;line-height:1.7;opacity:.85;margin-bottom:22px; }
+.dual-card ul { list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin-bottom:24px; }
+.dual-card li { font-size:14px;opacity:.9;display:flex;align-items:center;gap:8px; }
+.dual-card li::before { content:'✓';font-weight:700;color:rgba(255,255,255,.9); }
+.dual-cta {
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.2);
+  color:white;
+  border:1.5px solid rgba(255,255,255,.4);
+  border-radius:10px;
+  padding:10px 20px;
+  font-size:13px;font-weight:700;
+  text-decoration:none;
+  transition:background .2s;
+}
+.dual-cta:hover { background:rgba(255,255,255,.3); }
+
+/* ── BENEFITS ── */
+.benefits-section {
+  padding: 90px 32px;
+  background: #f7faff;
+}
+.section-label {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #0a5cf5;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(24px,3vw,38px);
+  font-weight: 800;
+  text-align: center;
+  color: #0b1f3a;
+  letter-spacing: -.5px;
+  margin-bottom: 10px;
+}
+.section-sub {
+  text-align: center;
+  color: #607080;
+  font-size: 15px;
+  max-width: 560px;
+  margin: 0 auto 56px;
+  line-height: 1.7;
+}
+.benefits-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+  gap: 22px;
+}
+.benefit-card {
+  background: white;
+  border-radius: 18px;
+  padding: 28px 24px;
+  border: 1px solid #e8f0fe;
+  box-shadow: 0 2px 16px rgba(10,92,245,.06);
+  transition: transform .25s, box-shadow .25s;
+}
+.benefit-card:hover { transform:translateY(-5px); box-shadow:0 12px 40px rgba(10,92,245,.13); }
+.benefit-icon {
+  width: 52px;height:52px;
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;
+  margin-bottom:16px;
+}
+.benefit-card h4 { font-family:'Sora',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px;color:#0b1f3a; }
+.benefit-card p  { font-size:14px;color:#607080;line-height:1.65; }
+
+/* ── HOW IT WORKS ── */
+.how-section {
+  padding: 90px 32px;
+  background: white;
+}
+.steps-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 32px;
+  position: relative;
+}
+.steps-wrap::before {
+  content:'';
+  position:absolute;
+  top:32px;left:calc(100%/6);right:calc(100%/6);
+  height:2px;
+  background: linear-gradient(90deg, #0a5cf5, #00c4a0);
+}
+.step {
+  text-align:center;
+  position:relative;
+  z-index:1;
+}
+.step-num {
+  width:64px;height:64px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#0a5cf5,#00c4a0);
+  color:white;
+  font-family:'Sora',sans-serif;
+  font-size:24px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;
+  box-shadow:0 6px 22px rgba(10,92,245,.35);
+}
+.step h4 { font-family:'Sora',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px;color:#0b1f3a; }
+.step p  { font-size:14px;color:#607080;line-height:1.6; }
+
+/* ── TRUST ── */
+.trust-section {
+  padding: 80px 32px;
+  background: linear-gradient(135deg, #0b1f3a, #0a3272);
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.trust-section::before {
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 50%,rgba(0,196,160,.18) 0%,transparent 55%),
+             radial-gradient(ellipse at 70% 30%,rgba(10,92,245,.2) 0%,transparent 50%);
+  pointer-events:none;
+}
+.trust-inner { position:relative;z-index:1;max-width:720px;margin:0 auto; }
+.trust-section h2 { font-family:'Sora',sans-serif;font-size:clamp(24px,3vw,38px);font-weight:800;margin-bottom:16px;letter-spacing:-.5px; }
+.trust-section p  { font-size:16px;opacity:.8;line-height:1.75;margin-bottom:40px; }
+.trust-badges { display:flex;gap:20px;justify-content:center;flex-wrap:wrap; }
+.trust-badge {
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:12px;
+  padding:14px 20px;
+  display:flex;align-items:center;gap:10px;
+  font-size:14px;font-weight:600;
+}
+.trust-badge span:first-child { font-size:22px; }
+
+/* ── CTA FINAL ── */
+.cta-section {
+  padding: 100px 32px;
+  background: #f7faff;
+  text-align: center;
+}
+.cta-section h2 { font-family:'Sora',sans-serif;font-size:clamp(28px,3.5vw,46px);font-weight:900;color:#0b1f3a;letter-spacing:-1px;margin-bottom:16px; }
+.cta-section p  { font-size:17px;color:#607080;max-width:540px;margin:0 auto 36px;line-height:1.7; }
+.cta-btns { display:flex;gap:14px;justify-content:center;flex-wrap:wrap; }
+.cta-btn-main {
+  padding:16px 36px;
+  background:linear-gradient(135deg,#0a5cf5,#0847c8);
+  color:white;
+  border:none;border-radius:14px;
+  font-family:'Sora',sans-serif;font-size:16px;font-weight:700;
+  cursor:pointer;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;
+  box-shadow:0 8px 28px rgba(10,92,245,.38);
+  transition:transform .2s,box-shadow .2s;
+}
+.cta-btn-main:hover { transform:translateY(-2px);box-shadow:0 14px 38px rgba(10,92,245,.5); }
+.cta-btn-alt {
+  padding:16px 36px;
+  background:transparent;
+  color:#0a5cf5;
+  border:2px solid #0a5cf5;
+  border-radius:14px;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:600;
+  cursor:pointer;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;
+  transition:background .2s,color .2s;
+}
+.cta-btn-alt:hover { background:#e8f0fe; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns:1fr; gap:40px; padding:40px 20px 60px; }
+  .hero-visual { order:-1; }
+  .dual-grid  { grid-template-columns:1fr; }
+  .steps-wrap { grid-template-columns:1fr; }
+  .steps-wrap::before { display:none; }
+}
+@media (max-width: 600px) {
+  .benefits-grid { grid-template-columns:1fr; }
+  .hero-ctas { flex-direction:column; }
+  .cta-btns  { flex-direction:column; align-items:center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="kd-navbar"></nav>
+<div id="kd-mobile-menu" class="kd-mobile-menu"></div>
+
+<!-- ══════════════════════
+     HERO
+     ══════════════════════ -->
+<section class="hero">
+  <div class="hero-grid">
+    <!-- Left copy -->
+    <div>
+      <div class="hero-eyebrow">
+        <span>🚀</span> La plataforma médica del siglo XXI
+      </div>
+      <h1 class="hero-title">
+        Digitaliza tu<br>
+        <em>consulta médica</em><br>
+        hoy mismo
+      </h1>
+      <p class="hero-sub">
+        KuraDoc es el sistema que conecta <strong style="color:white;">médicos, secretarias y pacientes</strong>
+        en una sola plataforma. Gestiona citas, expedientes y comunicaciones desde cualquier dispositivo,
+        sin filas y sin complicaciones.
+      </p>
+      <div class="hero-ctas">
+        <a href="index.html" class="hero-btn-main">🔐 Iniciar sesión</a>
+        <a href="index.html#registro" class="hero-btn-sec">✨ Crear cuenta gratis</a>
+      </div>
+      <div class="hero-badges">
+        <div class="hero-badge"><span class="dot"></span> Sin instalación requerida</div>
+        <div class="hero-badge"><span class="dot"></span> 100% en la nube</div>
+        <div class="hero-badge"><span class="dot"></span> Privacidad garantizada</div>
+      </div>
+    </div>
+    <!-- Right visual -->
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-header">
+          <div class="hero-card-icon" style="background:linear-gradient(135deg,#0a5cf5,#00c4a0);">📊</div>
+          <div>
+            <div class="hero-card-title">Panel del Médico</div>
+            <div class="hero-card-sub">Vista en tiempo real</div>
+          </div>
+        </div>
+        <div class="hero-stat-row">
+          <div class="hero-stat"><div class="hero-stat-val">24</div><div class="hero-stat-lbl">Citas hoy</div></div>
+          <div class="hero-stat"><div class="hero-stat-val">98%</div><div class="hero-stat-lbl">Confirmadas</div></div>
+          <div class="hero-stat"><div class="hero-stat-val">3</div><div class="hero-stat-lbl">En espera</div></div>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-header">
+          <div class="hero-card-icon" style="background:linear-gradient(135deg,#00796b,#4ecdc4);">📱</div>
+          <div>
+            <div class="hero-card-title">Paciente — Reserva tu cita</div>
+            <div class="hero-card-sub">Sin esperar en filas</div>
+          </div>
+        </div>
+        <div class="hero-mini-cards">
+          <div class="hero-mini-card"><span>🗓️</span><div class="hero-mini-card-txt">Agenda en segundos</div></div>
+          <div class="hero-mini-card"><span>🔔</span><div class="hero-mini-card-txt">Recordatorios auto</div></div>
+          <div class="hero-mini-card"><span>📋</span><div class="hero-mini-card-txt">Tu historial médico</div></div>
+          <div class="hero-mini-card"><span>💬</span><div class="hero-mini-card-txt">Notificaciones</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════
+     DUAL AUDIENCE
+     ══════════════════════ -->
+<section class="dual-section">
+  <h2>Diseñado para todos</h2>
+  <p class="sec-sub">Una sola plataforma pensada tanto para el profesional médico como para el paciente moderno que exige comodidad y rapidez.</p>
+  <div class="dual-grid">
+    <div class="dual-card medico reveal">
+      <div class="dual-card-badge">Para médicos y clínicas</div>
+      <div class="dual-card-icon">🩺</div>
+      <h3>Tu clínica en la palma de tu mano</h3>
+      <p>Administra agenda, expedientes, recetas y reportes desde cualquier dispositivo. Di adiós al papel y hola a la eficiencia digital.</p>
+      <ul>
+        <li>Agenda inteligente con gestión de turnos</li>
+        <li>Expediente digital completo por paciente</li>
+        <li>Recetas, analíticas y órdenes de estudios</li>
+        <li>Control financiero y estadísticas</li>
+        <li>Módulo de secretaría integrado</li>
+      </ul>
+      <a href="index.html" class="dual-cta">Empieza ahora →</a>
+    </div>
+    <div class="dual-card paciente reveal">
+      <div class="dual-card-badge">Para pacientes</div>
+      <div class="dual-card-icon">📱</div>
+      <h3>Agenda tu cita desde donde estés</h3>
+      <p>¿Cansado de esperar horas en filas para conseguir una cita? Con KuraDoc reserva en segundos desde tu teléfono, en cualquier momento del día.</p>
+      <ul>
+        <li>Reserva citas en 3 clics sin salir de casa</li>
+        <li>Recibe recordatorios automáticos</li>
+        <li>Accede a tu historial médico completo</li>
+        <li>Consulta resultados y recetas en línea</li>
+        <li>Sin filas, sin estrés, sin complicaciones</li>
+      </ul>
+      <a href="index.html#registro" class="dual-cta">Crear mi cuenta →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════
+     BENEFITS
+     ══════════════════════ -->
+<section class="benefits-section">
+  <div class="section-label">Beneficios clave</div>
+  <h2 class="section-title">Todo lo que necesita una clínica moderna</h2>
+  <p class="section-sub">Herramientas de nivel profesional diseñadas para aumentar tu productividad y la satisfacción de tus pacientes.</p>
+  <div class="benefits-grid">
+    <div class="benefit-card reveal">
+      <div class="benefit-icon" style="background:#e8f0fe;">📅</div>
+      <h4>Gestión de citas inteligente</h4>
+      <p>Agenda, reprograma y cancela citas con un sistema visual de turnos en tiempo real. Nunca más doble reserva.</p>
+    </div>
+    <div class="benefit-card reveal">
+      <div class="benefit-icon" style="background:#e0fdf4;">📁</div>
+      <h4>Expediente digital</h4>
+      <p>Historial clínico completo por paciente: consultas, diagnósticos, recetas, analíticas y estudios en un solo lugar.</p>
+    </div>
+    <div class="benefit-card reveal">
+      <div class="benefit-icon" style="background:#fef9c3;">💊</div>
+      <h4>Recetas electrónicas</h4>
+      <p>Emite recetas digitales con firma médica, farmacología y dosificación. Accesibles desde cualquier dispositivo.</p>
+    </div>
+    <div class="benefit-card reveal">
+      <div class="benefit-icon" style="background:#fce7f3;">📊</div>
+      <h4>Reportes financieros</h4>
+      <p>Dashboard con estadísticas de consultas, ingresos por período y análisis de tendencias de tu práctica médica.</p>
+    </div>
+    <div class="benefit-card reveal">
+      <div class="benefit-icon" style="background:#ede9fe;">🔔</div>
+      <h4>Notificaciones automáticas</h4>
+      <p>Recordatorios de citas vía WhatsApp, confirmaciones y alertas para pacientes y personal. Sin seguimiento manual.</p>
+    </div>
+    <div class="benefit-card reveal">
+      <div class="benefit-icon" style="background:#dcfce7;">🔒</div>
+      <h4>Seguridad y privacidad</h4>
+      <p>Datos cifrados en la nube con acceso controlado por roles. Cumplimiento con normativas de privacidad médica.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════
+     HOW IT WORKS
+     ══════════════════════ -->
+<section class="how-section">
+  <div class="section-label">Proceso simple</div>
+  <h2 class="section-title">Empieza en 3 pasos</h2>
+  <p class="section-sub">Sin instalaciones complicadas. KuraDoc funciona desde el primer día.</p>
+  <div class="steps-wrap">
+    <div class="step reveal">
+      <div class="step-num">1</div>
+      <h4>Crea tu cuenta</h4>
+      <p>Regístrate en menos de 2 minutos con tu correo. Sin tarjeta de crédito, sin compromisos iniciales.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">2</div>
+      <h4>Configura tu perfil</h4>
+      <p>Agrega tu especialidad, centro médico, horarios de atención y crea perfiles para tu equipo.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">3</div>
+      <h4>Gestiona todo digital</h4>
+      <p>Tus pacientes reservan citas, tú gestionas tu agenda y expedientes desde cualquier dispositivo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════
+     TRUST
+     ══════════════════════ -->
+<section class="trust-section">
+  <div class="trust-inner reveal">
+    <h2>Tu información médica, protegida al máximo nivel</h2>
+    <p>La privacidad de los pacientes es sagrada. KuraDoc utiliza infraestructura de nube con cifrado de extremo a extremo, control de acceso por roles y registros de auditoría. Tu práctica médica cumple con las más altas exigencias de seguridad de datos clínicos.</p>
+    <div class="trust-badges">
+      <div class="trust-badge"><span>🔐</span> Datos cifrados en tránsito y en reposo</div>
+      <div class="trust-badge"><span>🛡️</span> Control de acceso por roles</div>
+      <div class="trust-badge"><span>☁️</span> Infraestructura Google Cloud</div>
+      <div class="trust-badge"><span>✅</span> Política de privacidad transparente</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════
+     CTA FINAL
+     ══════════════════════ -->
+<section class="cta-section">
+  <h2 class="reveal">¿Listo para transformar<br>tu práctica médica?</h2>
+  <p class="reveal">Únete a los médicos y pacientes que ya confían en KuraDoc para una experiencia médica más ágil, moderna y humana.</p>
+  <div class="cta-btns reveal">
+    <a href="index.html" class="cta-btn-main">🔐 Iniciar sesión</a>
+    <a href="index.html#registro" class="cta-btn-alt">✨ Crear cuenta gratis</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="kd-footer">
+  <p>© 2026 KuraDoc · Sistema de Gestión Médica Digital ·
+    <a href="terminos.html">Términos y Condiciones</a> ·
+    <a href="privacidad.html">Política de Privacidad</a>
+  </p>
+</footer>
+
+<script src="navbar.js"></script>
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
