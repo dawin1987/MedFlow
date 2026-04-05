@@ -323,6 +323,14 @@
                     <button class="pdd-btn" onclick="abrirEditarPerfil(); closeProfileDropdown();">
                         <span class="pdd-btn-icon">✏️</span> Editar Perfil
                     </button>
+                    <!-- Récords del paciente — solo visible si rol=paciente -->
+                    <div id="pdd-records-section" class="hidden">
+                        <div class="pdd-divider"></div>
+                        <div class="pdd-records-title">🗂 Mis Números de Récord</div>
+                        <div id="pdd-records-list">
+                            <div class="pdd-records-loading">Cargando...</div>
+                        </div>
+                    </div>
                     <div class="pdd-divider"></div>
                     <button class="pdd-btn danger" onclick="closeProfileDropdown(); logout();">
                         <span class="pdd-btn-icon">🚪</span> Cerrar Sesión
