@@ -14720,6 +14720,7 @@ function toggleProfileDropdown(e) {
     const isOpen = dd.classList.toggle('open');
     // Cerrar al hacer clic fuera
     if (isOpen) {
+        _cargarRecordsEnDropdown();
         setTimeout(() => {
             document.addEventListener('click', _closeProfileOnOutsideClick, { once: true });
         }, 10);
@@ -14735,6 +14736,50 @@ window.closeProfileDropdown = function() {
     const dd = document.getElementById('profile-dropdown');
     if (dd) dd.classList.remove('open');
 };
+
+// ── Cargar récords del paciente en el dropdown de perfil ──────────
+async function _cargarRecordsEnDropdown() {
+    const ud      = appState.currentUserData;
+    const section = document.getElementById('pdd-records-section');
+    const list    = document.getElementById('pdd-records-list');
+    if (!section || !list) return;
+
+    // Solo mostrar para pacientes
+    if (!ud || ud.rol !== 'paciente') {
+        section.classList.add('hidden');
+        return;
+    }
+
+    section.classList.remove('hidden');
+    list.innerHTML = '<div class="pdd-records-loading">Cargando...</div>';
+
+    try {
+        const pacienteId = appState.currentUser?.uid;
+        if (!pacienteId) throw new Error('Sin uid');
+
+        const snap = await db.collection('users').doc(pacienteId)
+            .collection('records')
+            .get();
+
+        if (snap.empty) {
+            list.innerHTML = '<div class="pdd-records-empty">Sin récords asignados aún.</div>';
+            return;
+        }
+
+        list.innerHTML = snap.docs.map(doc => {
+            const r = doc.data();
+            return `
+            <div class="pdd-record-item">
+                <span class="pdd-record-badge">Rec. #${r.numeroRecord}</span>
+                <span class="pdd-record-centro" title="${r.centroNombre || ''}">${r.centroNombre || 'Centro desconocido'}</span>
+            </div>`;
+        }).join('');
+
+    } catch(e) {
+        list.innerHTML = '<div class="pdd-records-empty">No se pudieron cargar.</div>';
+        console.warn('[DropdownRecords]', e.message);
+    }
+}
 
 // ── Abrir modal de edición ────────────────────────────────────────
 window.abrirEditarPerfil = function(pacienteIdExterno = null) {
@@ -18920,6 +18965,12 @@ window._verificarRecordParaCita = async function(pacienteId, medicoId) {
 
     const record = await getRecordPorCentro(pacienteId, centroId);
 
+    // ── FIX: si ya tiene récord guardado, usarlo directamente sin abrir modal ──
+    if (record?.numeroRecord) {
+        return { numeroRecord: record.numeroRecord, continuar: true };
+    }
+
+    // Solo abrir el modal si NO tiene récord todavía
     return new Promise((resolve) => {
         _mostrarModalRecordCita(pacienteId, centroId, centroNombre, record, resolve);
     });
@@ -18994,7 +19045,7 @@ function _mostrarModalRecordCita(pacienteId, centroId, centroNombre, record, res
             </div>
             <div class="record-actions">
                 <button class="record-btn record-btn-primary"
-                    onclick="_guardarYResolverRecord('${pacienteId}','${centroId}','${centroNombre}')">
+                    onclick="_guardarYResolverRecord()">
                     💾 Guardar y continuar
                 </button>
                 <button class="record-btn record-btn-outline" onclick="_resolverRecordCita('')">
@@ -19005,18 +19056,24 @@ function _mostrarModalRecordCita(pacienteId, centroId, centroNombre, record, res
         </div>
     </div>`;
 
-    // Guardar resolve en contexto global temporal
-    window._recordCitaResolve = resolve;
+    // Guardar resolve y contexto en variables globales temporales
+    window._recordCitaResolve   = resolve;
+    window._recordCitaPacienteId = pacienteId;
+    window._recordCitaCentroId   = centroId;
     document.body.appendChild(overlay);
 }
 
 window._toggleEditarRecord = function(pacienteId, centroId, centroNombre) {
+    // Actualizar variables globales temporales con los datos actuales
+    window._recordCitaPacienteId = pacienteId;
+    window._recordCitaCentroId   = centroId;
+
     const area = document.getElementById('recordEditArea');
     const btn = document.getElementById('btnEditarRecord');
     if (area.style.display === 'none') {
         area.style.display = 'block';
         btn.textContent = '💾 Guardar nuevo récord';
-        btn.onclick = () => _guardarYResolverRecord(pacienteId, centroId, centroNombre);
+        btn.onclick = () => _guardarYResolverRecord();
     } else {
         area.style.display = 'none';
         btn.textContent = '✏️ Editar récord';
@@ -19033,19 +19090,29 @@ window._resolverRecordCita = function(numeroRecord) {
     }
 };
 
-window._guardarYResolverRecord = async function(pacienteId, centroId, centroNombre) {
+window._guardarYResolverRecord = async function() {
+    const pacienteId  = window._recordCitaPacienteId || '';
+    const centroId    = window._recordCitaCentroId   || '';
+    const centro      = appState.centrosMedicos.find(c => c.id === centroId);
+    const centroNombre = centro?.nombre || '';
+
     const input = document.getElementById('inputNuevoRecord');
     const numeroRecord = input?.value.trim() || '';
 
     if (numeroRecord) {
         try {
             await guardarRecord(pacienteId, centroId, centroNombre, numeroRecord);
+            console.log('[Records] ✅ Récord guardado:', numeroRecord, 'centro:', centroNombre);
             // Refrescar lista de pacientes si está visible
             if (appState.currentView === 'pacientes') setTimeout(renderListaPacientesSolo, 300);
         } catch(e) {
             console.warn('[Records] No se pudo guardar récord al agendar:', e.message);
         }
     }
+
+    // Limpiar variables temporales
+    window._recordCitaPacienteId = '';
+    window._recordCitaCentroId   = '';
     _resolverRecordCita(numeroRecord);
 };
 
