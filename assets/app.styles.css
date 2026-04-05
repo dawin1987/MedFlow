@@ -1881,6 +1881,57 @@ Specificity: (0,2,0)
 .pdd-btn-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
 .pdd-divider { height: 1px; background: #f1f5f9; margin: 4px 0; }
 
+/* ── Sección de Récords en el dropdown de perfil ── */
+.pdd-records-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: #94a3b8;
+    padding: 8px 12px 4px;
+}
+.pdd-records-loading {
+    font-size: 11px;
+    color: #94a3b8;
+    padding: 4px 12px 8px;
+    font-style: italic;
+}
+.pdd-record-item {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    padding: 2px 12px;
+    border-radius: 8px;
+    margin: 2px 0;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    flex-direction: column;
+}
+.pdd-record-badge {
+    background: #1e3a52;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.pdd-record-centro {
+    font-size: 11px;
+    color: #475569;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pdd-records-empty {
+    font-size: 11px;
+    color: #94a3b8;
+    padding: 4px 12px 8px;
+    font-style: italic;
+}
+
 /* Modal de edición de perfil */
 #modal-edit-perfil {
     display: none;
