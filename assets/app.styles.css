@@ -935,7 +935,7 @@ Specificity: (0,2,0)
     position: fixed;
     inset: 0;
     display: flex;
-    background: #141414;
+    background: #071a24;
 }
 
 /* SECCIÓN IZQUIERDA */
@@ -1030,6 +1030,8 @@ Specificity: (0,2,0)
                 }
 
     .login-card {
+                margin-bottom: 20px;
+        border: 1px solid #dfdfdf;
         background: #ffffff;
         border-radius: 12px;
         max-width: 100%;
@@ -1037,7 +1039,7 @@ Specificity: (0,2,0)
               }
 
     .imagen-formulario {
-    /* background-image: url(img/loginmedicina.png); */
+   background: #ededed;
     position: fixed;
     inset: 0;
     display: flex;
