@@ -1041,9 +1041,9 @@ async function loadAllData() {
         console.log(`[loadAllData] ${activeListeners.length} listeners activos (rol: ${rol})`);
 
         // Iniciar listener de anuncios para médicos
-        if (rol === 'medico' && typeof _initAdsListener === 'function') {
-            _initAdsListener();
-        }
+        if ((rol === 'medico' || rol === 'paciente') && typeof _initAdsListener === 'function') {
+    _initAdsListener();
+}
 
     } catch (error) {
         console.error('[loadAllData] Error:', error);
@@ -1118,7 +1118,7 @@ function refreshCurrentView() {
 
         // NAVEGACIÓN
         function initializeApp() {
-            const defaultViews = { admin: 'centros', medico: 'agenda', secretaria: 'citas', paciente: 'agendas' };
+            const defaultViews = { admin: 'centros', medico: 'agenda', secretaria: 'citas', paciente: 'inicio' };
             renderMobileNav();
             navigateTo(defaultViews[appState.currentUserData.rol]);
         
@@ -1149,6 +1149,7 @@ function renderMobileNav() {
             
         ],
         paciente: [
+            { icon: '🏠', label: 'Inicio', view: 'inicio' },
             { icon: '🔍', label: 'Agendas', view: 'agendas' }, 
             { icon: '📅', label: 'Mis Citas', view: 'mis-citas' },
             { icon: '🤍', label: 'Favoritos', view: 'favoritos' }
@@ -1194,6 +1195,7 @@ function navigateTo(view) {
         case 'especialidades': renderEspecialidades(); break;
         case 'agenda': renderAgenda(); break;
         case 'finanzas': renderFinanzas(); break;
+        case 'inicio': renderInicioPaciente(); break;
         case 'agendas': renderAgendasPaciente(); break;
         case 'mis-citas': renderMisCitas(); break;
         case 'favoritos': renderFavoritos(); break;
@@ -15690,7 +15692,7 @@ window._fpVerClave = async function(pacienteUid) {
 // ║  MÓDULO ANUNCIOS — Slider médico + Panel admin                   ║
 // ╚══════════════════════════════════════════════════════════════════╝
 
-let _adsData = [], _adsCurrent = 0, _adsTimer = null, _adsUnsubscribe = null;
+window._adsData = []; let _adsCurrent = 0, _adsTimer = null, _adsUnsubscribe = null;
 
 function _initAdsListener() {
     if (_adsUnsubscribe) _adsUnsubscribe();
@@ -15704,7 +15706,7 @@ function _initAdsListener() {
             console.log('[Anuncios] docs recibidos:', rawAds.length, rawAds.map(a=>({id:a.id,titulo:a.titulo,activo:a.activo,imagenUrl:a.imagenUrl?.slice(0,40)})));
             
             // Filtro tolerante: solo excluir si fechaFin existe Y ya pasó
-            _adsData = rawAds.filter(ad => {
+            window._adsData = rawAds.filter(ad => {
                 if (!ad.fechaFin) return true;
                 try {
                     const fin = ad.fechaFin?.toDate ? ad.fechaFin.toDate()
@@ -15718,6 +15720,7 @@ function _initAdsListener() {
             _adsCurrent = 0;
             // Pintar solo si el slider ya está en el DOM
             if (document.getElementById('ads-slider-wrap')) _renderAdsSlider();
+            if (document.getElementById('pi-ads-slider')) _piRenderAds();
         }, err => console.warn('[Anuncios] error:', err.code || err.message));
 }
 
@@ -17101,7 +17104,7 @@ window._ncRender = function() {
          style="background:${gradBg};margin-bottom:18px;position:relative;">
 
         <!-- Barra superior con gradiente ────────────────────────── -->
-        <div style="height:4px;background:linear-gradient(90deg,${accent},${accent}99,${accent}22,transparent);  border-radius:28px 28px 0 0;"></div>
+        <div style="margin-right: 40px; margin-left: 40px;height:7px;background:linear-gradient(180deg,${accent},${accent}99,${accent}22,#101d3e96);  border-radius:28px 28px 0 0;"></div>
 
         <div style="background: #007b8757;border-radius: 10px; border: 1px solid #ec8c49; padding:5px 10px 5px;box-shadow: 0 20px 40px -80px ${accent}33, 0 0 20px ${accent}22, 0 0 10px ${accent}44;">
 
@@ -17112,8 +17115,8 @@ window._ncRender = function() {
                         ${confirmado ? '✅' : urgente ? '⏰' : '🗓️'}
                     </div>
                     <div>
-                        <div style="font-size:11px;color:${accent};font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px;">
-                            📋 Próxima cita médica
+                        <div style="font-size:11px;color:${accent};font-weight:660;text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px;">
+                            Próxima cita médica
                         </div>
                         <div style="font-size:15px;font-weight:900;color:#0f172a;letter-spacing:-.3px;line-height:1.2;">
                             ${saludo}, ${apellido}
@@ -17121,14 +17124,14 @@ window._ncRender = function() {
                     </div>
                 </div>
                 <button onclick="_ncClose('${cita.id}')"
-                    style="background:none;border:none;color:#cbd5e1;font-size:18px;cursor:pointer;padding:4px 8px;border-radius:10px;line-height:1;transition:all .2s;flex-shrink:0;"
+                    style="background:none;border:none;color:#95989b;font-size:18px;cursor:pointer;padding:4px 8px;border-radius:10px;line-height:1;transition:all .2s;flex-shrink:0;"
                     onmouseover="this.style.background='#f1f5f9';this.style.color='#64748b'"
                     onmouseout="this.style.background='none';this.style.color='#cbd5e1'"
                     title="Cerrar (reaparece en 2h)">×</button>
             </div>
 
             <!-- ROW 2: Narrativa ─────────────────────────────────── -->
-            <div style="text-align: justify;font-size:12px;color:#475569;line-height:1.6;margin:5px 0 6px;padding:12px 15px;background:white;border-radius:16px;border:1px solid ${accent}18;box-shadow:0 1px 4px rgba(0,0,0,.04);">
+            <div style="text-align: justify;font-size:11px;color:#475569;line-height:1.1;margin:2px 0 3px;padding:2px 5px;background:white;border-radius:9px;border:1px solid ${accent}18;box-shadow:0 1px 4px rgba(0,0,0,.04);">
                 Tiene una cita <span style="font-weight:800;color:${accent};text-transform:capitalize;">${estadoCita}</span> con el/la
                 <strong style="color:#0f172a;"> ${nombreMed}</strong>${especialidad ? `, <span style="color:#64748b;">especialista en <em>${especialidad}</em></span>` : ''}, para el
                 <strong style="color:#0f172a;text-transform:capitalize;">${fechaLabel}</strong>,
@@ -17182,9 +17185,9 @@ window._ncRender = function() {
             </div>
 
             <!-- ROW 4: Tip dinámico ──────────────────────────────── -->
-            <div style="display:flex;align-items:flex-start;gap:9px;background:${accentLight};border-left:3px solid ${accent};border-radius:10px;padding 3px 4px;margin-bottom:6px;">
-                <span style="font-size:14px;flex-shrink:0;margin-top:1px;">${confirmado ? '🎉' : '💬'}</span>
-                <p style="margin:0;font-size:12px;color:#374151;line-height:1.55;">${tip}</p>
+            <div style="display:flex;align-items:flex-start;gap:1px;background:${accentLight};border-left:3px solid ${accent};border-radius:10px;padding 3px 4px;margin-bottom:6px;">
+                <span style="font-size:11px;flex-shrink:0;margin-top:1px;">${confirmado ? ' ' : '💬'}</span>
+                <p style="text-align:center;margin:0;font-size:11px;color:#374151;line-height:1.25;">${tip}</p>
             </div>
 
             <!-- ROW 5: Acciones ──────────────────────────────────── -->
@@ -17192,8 +17195,8 @@ window._ncRender = function() {
                 <!-- Badge confirmación -->
                 <div>
                     ${confirmado
-                        ? `<span style="display:inline-flex;align-items:center;gap:5px;background:#dcfce7;color:#15803d;border:1px solid #86efac;padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;">✅ Confirmada por ti</span>`
-                        : `<span style="display:inline-flex;align-items:center;gap:5px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;">⏳ Sin confirmar</span>`
+                        ? `<span style="display:inline-flex;align-items:center;gap:5px;background:#dcfce7;color:#15803d;border:1px solid #86efac;padding:9px 12px;border-radius:10px;font-size:10px;font-weight:650;">✅ Confirmada por ti</span>`
+                        : `<span style="display:inline-flex;align-items:center;gap:5px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:9px 12px;border-radius:10px;font-size:10px;font-weight:650;">⏳ Sin confirmar</span>`
                     }
                 </div>
                 <!-- Botones -->
@@ -19906,3 +19909,676 @@ window.nciGuardar=async function(){
 /* exponer N globalmente para el onchange del select tipo */
 window.N=N;
 })();
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SECCIÓN INICIO PACIENTE — Vista de inicio personalizada para el paciente
+   Integra: Slider de anuncios, Próxima Cita, Médicos Favoritos,
+   Historial de Consultas, Resumen Historial Médico, Recetas Digitales,
+   Estudios & Analíticas
+   © 2026 KuraDoc
+═══════════════════════════════════════════════════════════════════════ */
+
+window.renderInicioPaciente = async function() {
+    appState.currentView = 'inicio';
+    renderMobileNav();
+    const main = document.getElementById('mainContent');
+    const uid  = appState.currentUser?.uid;
+    const user = appState.currentUserData;
+    if (!uid || !user) return;
+
+    const nombreCorto = (user.nombre || 'Paciente').split(' ')[0];
+    const hora = new Date().getHours();
+    const saludo = hora < 12 ? '🌅 Buenos días' : hora < 19 ? '☀️ Buenas tardes' : '🌙 Buenas noches';
+
+    main.innerHTML = `
+    <div class="pi-wrap">
+
+        <!-- ── CABECERA DE BIENVENIDA ── -->
+        <div class="pi-header">
+            <div class="pi-header-text">
+                <div class="pi-saludo">${saludo}</div>
+                <h1 class="pi-nombre">${nombreCorto} <span class="pi-wave">👋</span></h1>
+                <p class="pi-sub">Tu resumen de salud de hoy</p>
+            </div>
+            <div class="pi-quick-actions">
+                <button class="pi-qa-btn pi-qa-agenda" onclick="navigateTo('agendas')" title="Agendar Cita">
+                    <span class="pi-qa-icon">📅</span>
+                    <span class="pi-qa-label">Agendar</span>
+                </button>
+                <button class="pi-qa-btn pi-qa-historial" onclick="navigateTo('mis-citas')" title="Mis Citas">
+                    <span class="pi-qa-icon">🗂️</span>
+                    <span class="pi-qa-label">Mis Citas</span>
+                </button>
+                <button class="pi-qa-btn pi-qa-urgencia" onclick="alert('Para emergencias llame al 911 o acuda al centro médico más cercano.')" title="Urgencias">
+                    <span class="pi-qa-icon">🚨</span>
+                    <span class="pi-qa-label">Urgencias</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ── SLIDER DE ANUNCIOS ── -->
+        <section class="pi-section">
+            <div id="pi-ads-slider" class="pi-ads-slider-wrap empty">
+                <div class="pi-ads-empty">📢 Cargando anuncios…</div>
+            </div>
+        </section>
+
+        <!-- ── PRÓXIMA CITA ── -->
+        <section class="pi-section">
+            <div class="pi-section-header">
+                <h2 class="pi-section-title">📅 Próxima Cita</h2>
+            </div>
+            <div id="pi-proxima-cita">
+                <div class="pi-loading">⏳ Cargando cita...</div>
+            </div>
+        </section>
+
+        <!-- ── MIS MÉDICOS FAVORITOS ── -->
+        <section class="pi-section">
+            <div class="pi-section-header">
+                <h2 class="pi-section-title">❤️ Mis Médicos Favoritos</h2>
+                <button class="pi-ver-mas" onclick="navigateTo('favoritos')">Ver todos →</button>
+            </div>
+            <div id="pi-favoritos">
+                <div class="pi-loading">⏳ Cargando favoritos...</div>
+            </div>
+        </section>
+
+        <!-- ── HISTORIAL DE CONSULTAS ── -->
+        <section class="pi-section">
+            <div class="pi-section-header">
+                <h2 class="pi-section-title">🗂️ Historial de Consultas</h2>
+                <button class="pi-ver-mas" onclick="navigateTo('mis-citas')">Ver todas →</button>
+            </div>
+            <div id="pi-historial-consultas">
+                <div class="pi-loading">⏳ Cargando historial...</div>
+            </div>
+        </section>
+
+        <!-- ── RESUMEN HISTORIAL MÉDICO ── -->
+        <section class="pi-section">
+            <div class="pi-section-header">
+                <h2 class="pi-section-title">📋 Resumen Historial Médico</h2>
+            </div>
+            <div id="pi-historial-medico">
+                <div class="pi-loading">⏳ Cargando diagnósticos...</div>
+            </div>
+        </section>
+
+        <!-- ── RECETAS DIGITALES ── -->
+        <section class="pi-section">
+            <div class="pi-section-header">
+                <h2 class="pi-section-title">💊 Recetas Digitales</h2>
+            </div>
+            <div id="pi-recetas">
+                <div class="pi-loading">⏳ Cargando recetas...</div>
+            </div>
+        </section>
+
+        <!-- ── ESTUDIOS & ANALÍTICAS ── -->
+        <section class="pi-section">
+            <div class="pi-section-header">
+                <h2 class="pi-section-title">🔬 Estudios & Analíticas</h2>
+            </div>
+            <div id="pi-estudios">
+                <div class="pi-loading">⏳ Cargando estudios...</div>
+            </div>
+        </section>
+
+    </div>`;
+
+    // ── Cargar todas las secciones en paralelo ──
+    _piRenderAds();
+    _piRenderProximaCita(uid);
+    _piRenderFavoritos(uid);
+    _piRenderHistorialConsultas(uid);
+    _piRenderHistorialMedico(uid);
+    _piRenderRecetas(uid);
+    _piRenderEstudios(uid);
+};
+
+/* ──────────────────────────────────────────────────────────────────
+   SECCIÓN: SLIDER DE ANUNCIOS (reutiliza _adsData del listener global)
+────────────────────────────────────────────────────────────────── */
+function _piRenderAds() {
+    const wrap = document.getElementById('pi-ads-slider');
+    if (!wrap) return;
+
+    const ads = window._adsData || [];
+    if (ads.length === 0) {
+        wrap.className = 'pi-ads-slider-wrap empty';
+        wrap.innerHTML = '<div class="pi-ads-empty">📢 Sin anuncios activos en este momento</div>';
+        return;
+    }
+
+    wrap.className = 'pi-ads-slider-wrap';
+    let _current = 0;
+
+    const isNew = ad => (Date.now() - ((ad.creadoEn?.toDate ? ad.creadoEn.toDate() : new Date()).getTime())) < 86400000;
+
+    const render = () => {
+        wrap.innerHTML = ads.map((ad, i) => `
+            <div class="pi-ad-slide ${i === 0 ? 'active' : ''}" id="pi-ad-slide-${i}"
+                 style="cursor:${ad.linkUrl ? 'pointer' : 'default'}"
+                 onclick="${ad.linkUrl ? `window.open('${ad.linkUrl}','_blank','noopener')` : ''}">
+                <img src="${ad.imagenUrl}" alt="${ad.titulo || 'Anuncio'}"
+                     onerror="this.parentElement.style.background='#1e293b';this.style.display='none'">
+                <div class="pi-ad-overlay">
+                    ${ad.titulo ? `<div class="pi-ad-titulo">${ad.titulo}</div>` : ''}
+                    ${ad.descripcion ? `<div class="pi-ad-desc">${ad.descripcion}</div>` : ''}
+                    ${ad.linkUrl ? '<div class="pi-ad-cta">Ver más →</div>' : ''}
+                </div>
+                ${isNew(ad) ? '<div class="pi-ad-badge-new">✨ Nuevo</div>' : ''}
+                ${ads.length > 1 ? `<div class="pi-ad-dots">${ads.map((_, j) => `<div class="pi-ad-dot ${j === 0 ? 'on' : ''}" id="pi-dot-${j}"></div>`).join('')}</div>` : ''}
+            </div>`).join('');
+    };
+    render();
+
+    if (ads.length > 1) {
+        const advance = () => {
+            const slides = wrap.querySelectorAll('.pi-ad-slide');
+            const dots   = wrap.querySelectorAll('.pi-ad-dot');
+            if (!slides.length) return;
+            slides[_current]?.classList.add('pi-exit-left');
+            dots[_current]?.classList.remove('on');
+            slides[_current]?.classList.remove('active');
+            _current = (_current + 1) % ads.length;
+            const next = slides[_current];
+            if (next) {
+                next.style.transform = 'translateX(60px)'; next.style.opacity = '0';
+                next.classList.remove('pi-exit-left');
+                requestAnimationFrame(() => { next.classList.add('active'); next.style.transform = ''; next.style.opacity = ''; });
+            }
+            dots[_current]?.classList.add('on');
+            setTimeout(() => wrap.querySelectorAll('.pi-ad-slide.pi-exit-left').forEach(el => el.classList.remove('pi-exit-left')), 900);
+        };
+        // Limpiar timer previo si existe
+        if (window._piAdsTimer) clearInterval(window._piAdsTimer);
+        window._piAdsTimer = setInterval(advance, 6000);
+    }
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   SECCIÓN: PRÓXIMA CITA
+────────────────────────────────────────────────────────────────── */
+function _piRenderProximaCita(uid) {
+    const cont = document.getElementById('pi-proxima-cita');
+    if (!cont) return;
+
+    const hoy = fechaHoy();
+    const proximas = (appState.citas || [])
+        .filter(c => c.fechaStr >= hoy && c.estado !== 'cancelada' && c.estado !== 'atendida')
+        .sort((a, b) => (a.fechaStr || '').localeCompare(b.fechaStr || ''));
+
+    if (proximas.length === 0) {
+        cont.innerHTML = `
+        <div class="pi-empty-card">
+            <div class="pi-empty-icon">📭</div>
+            <p class="pi-empty-msg">No tienes citas próximas agendadas</p>
+            <button class="pi-btn-agendar" onclick="navigateTo('agendas')">📅 Agendar una cita</button>
+        </div>`;
+        return;
+    }
+
+    const c      = proximas[0];
+    const medico = _uGet(c.medicoId) || {};
+    const centro = (appState.centrosMedicos || []).find(x => x.id === medico.centroMedicoId) || {};
+    const tanda  = c.tanda ? (c.tanda.charAt(0).toUpperCase() + c.tanda.slice(1)) : (c.horaInicio || '—');
+    const fechaBonita = c.fechaStr
+        ? new Date(c.fechaStr + 'T12:00:00').toLocaleDateString('es-DO',
+            { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
+        : 'Sin fecha';
+
+    const estadoColors = {
+        pendiente:  { bg: '#fffbeb', border: '#fde68a', badge: '#f59e0b' },
+        confirmada: { bg: '#eff6ff', border: '#bfdbfe', badge: '#2563eb' },
+    }[c.estado] || { bg: '#f8fafc', border: '#e2e8f0', badge: '#94a3b8' };
+
+    cont.innerHTML = `
+    <div class="pi-cita-card" style="background:${estadoColors.bg};border-color:${estadoColors.border}">
+        <div class="pi-cita-accent" style="background:${estadoColors.badge}"></div>
+        <div class="pi-cita-body">
+            <div class="pi-cita-avatar">🩺</div>
+            <div class="pi-cita-info">
+                <div class="pi-cita-medico">${medico.nombre || 'Médico'}</div>
+                <div class="pi-cita-esp">${medico.especialidad || ''}</div>
+                <div class="pi-cita-chips">
+                    <span class="pi-chip pi-chip-fecha">📅 ${fechaBonita}</span>
+                    <span class="pi-chip pi-chip-tanda">🕐 ${tanda}</span>
+                    ${c.ordenAtencion ? `<span class="pi-chip pi-chip-turno">🎫 Turno #${c.ordenAtencion}</span>` : ''}
+                    ${centro.nombre ? `<span class="pi-chip pi-chip-centro">🏥 ${centro.nombre}</span>` : ''}
+                </div>
+            </div>
+        </div>
+        <div class="pi-cita-footer">
+            <span class="pi-badge-estado" style="background:${estadoColors.badge}20;color:${estadoColors.badge}">
+                ${(c.estado || 'pendiente').toUpperCase()}
+            </span>
+            <button class="pi-btn-ver-detalle" onclick="_piVerDetalleCita('${c.id}')">Ver Detalles →</button>
+        </div>
+    </div>
+    ${proximas.length > 1 ? `<p class="pi-mas-citas">+ ${proximas.length - 1} cita${proximas.length - 1 > 1 ? 's' : ''} más agendada${proximas.length - 1 > 1 ? 's' : ''}. <button class="pi-link" onclick="navigateTo('mis-citas')">Ver todas</button></p>` : ''}`;
+}
+
+window._piVerDetalleCita = function(citaId) {
+    const c = (appState.citas || []).find(x => x.id === citaId);
+    if (!c) { navigateTo('mis-citas'); return; }
+    const medico = _uGet(c.medicoId) || {};
+    const centro = (appState.centrosMedicos || []).find(x => x.id === medico.centroMedicoId) || {};
+    const tanda  = c.tanda ? (c.tanda.charAt(0).toUpperCase() + c.tanda.slice(1)) : (c.horaInicio || '—');
+    const fechaBonita = c.fechaStr
+        ? new Date(c.fechaStr + 'T12:00:00').toLocaleDateString('es-DO',
+            { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
+        : 'Sin fecha';
+
+    const estadoColors = {
+        pendiente:  '#f59e0b',
+        confirmada: '#2563eb',
+        atendida:   '#10b981',
+        cancelada:  '#ef4444'
+    }[c.estado] || '#94a3b8';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'pi-modal-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+    <div class="pi-modal-box" onclick="event.stopPropagation()">
+        <div class="pi-modal-head" style="background:linear-gradient(135deg,${estadoColors},${estadoColors}cc)">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:22px;">🩺</span>
+                <div>
+                    <div style="color:white;font-weight:800;font-size:16px;">${medico.nombre || 'Médico'}</div>
+                    <div style="color:rgba(255,255,255,.75);font-size:12px;">${medico.especialidad || ''}</div>
+                </div>
+            </div>
+            <button class="pi-modal-close" onclick="this.closest('.pi-modal-overlay').remove()">✕</button>
+        </div>
+        <div class="pi-modal-body">
+            <div class="pi-detail-grid">
+                <div class="pi-detail-item"><span class="pi-detail-label">📅 Fecha</span><span class="pi-detail-val" style="text-transform:capitalize">${fechaBonita}</span></div>
+                <div class="pi-detail-item"><span class="pi-detail-label">🕐 Tanda</span><span class="pi-detail-val">${tanda}</span></div>
+                <div class="pi-detail-item"><span class="pi-detail-label">🎫 Turno</span><span class="pi-detail-val" style="font-size:20px;font-weight:900;color:${estadoColors}">#${c.ordenAtencion || c.numeroOrden || '—'}</span></div>
+                <div class="pi-detail-item"><span class="pi-detail-label">📊 Estado</span><span class="pi-detail-val"><span style="background:${estadoColors}20;color:${estadoColors};padding:3px 10px;border-radius:20px;font-weight:700;font-size:11px">${(c.estado || 'pendiente').toUpperCase()}</span></span></div>
+                ${centro.nombre ? `<div class="pi-detail-item"><span class="pi-detail-label">🏥 Centro</span><span class="pi-detail-val">${centro.nombre}</span></div>` : ''}
+                ${centro.direccion ? `<div class="pi-detail-item"><span class="pi-detail-label">📍 Dirección</span><span class="pi-detail-val">${centro.direccion}</span></div>` : ''}
+                ${centro.telefono ? `<div class="pi-detail-item"><span class="pi-detail-label">📞 Teléfono</span><span class="pi-detail-val">${centro.telefono}</span></div>` : ''}
+                ${medico.telefono ? `<div class="pi-detail-item"><span class="pi-detail-label">📱 Médico Tel.</span><span class="pi-detail-val">${medico.telefono}</span></div>` : ''}
+                ${c.tipoCita ? `<div class="pi-detail-item"><span class="pi-detail-label">🏷️ Tipo</span><span class="pi-detail-val">${c.tipoCita}</span></div>` : ''}
+                ${c.motivoConsulta ? `<div class="pi-detail-item pi-detail-full"><span class="pi-detail-label">📝 Motivo</span><span class="pi-detail-val">${c.motivoConsulta}</span></div>` : ''}
+                ${c.seguroMedicoPaciente ? `<div class="pi-detail-item"><span class="pi-detail-label">🛡️ Seguro</span><span class="pi-detail-val">${c.seguroMedicoPaciente}</span></div>` : ''}
+            </div>
+        </div>
+        <div class="pi-modal-footer">
+            <button class="pi-btn-secondary" onclick="this.closest('.pi-modal-overlay').remove()">Cerrar</button>
+            <button class="pi-btn-primary" onclick="this.closest('.pi-modal-overlay').remove();navigateTo('agendas')">📅 Nueva Cita</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+};
+
+/* ──────────────────────────────────────────────────────────────────
+   SECCIÓN: MÉDICOS FAVORITOS
+────────────────────────────────────────────────────────────────── */
+function _piRenderFavoritos(uid) {
+    const cont = document.getElementById('pi-favoritos');
+    if (!cont) return;
+
+    const safeUid = uid.replace(/[.#$\/\[\]]/g, '');
+    const likedIds = Object.entries(appState.likesData || {})
+        .filter(([, d]) => (d.users || {})[safeUid] === true)
+        .map(([id]) => id);
+
+    const medicos = (appState.users || []).filter(m =>
+        m.rol === 'medico' && m.activo !== false && likedIds.includes(m.id)
+    ).slice(0, 6);
+
+    if (medicos.length === 0) {
+        cont.innerHTML = `
+        <div class="pi-empty-card">
+            <div class="pi-empty-icon">🩷</div>
+            <p class="pi-empty-msg">Aún no tienes médicos favoritos.<br>Dale ❤️ a los médicos en <strong>Agendas</strong>.</p>
+            <button class="pi-btn-agendar" onclick="navigateTo('agendas')">🔍 Explorar Agendas</button>
+        </div>`;
+        return;
+    }
+
+    cont.innerHTML = `<div class="pi-favs-scroll">
+        ${medicos.map(m => {
+            const centro = (appState.centrosMedicos || []).find(c => c.id === m.centroMedicoId) || {};
+            const fotoHtml = m.fotoUrl
+                ? `<img src="${m.fotoUrl}" alt="${m.nombre}" class="pi-fav-foto" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                : '';
+            return `
+            <div class="pi-fav-card" onclick="window.abrirDetalleMedico && abrirDetalleMedico('${m.id}')">
+                <div class="pi-fav-avatar">
+                    ${fotoHtml}
+                    <div class="pi-fav-avatar-fallback" style="${m.fotoUrl ? 'display:none' : 'display:flex'}">👨‍⚕️</div>
+                </div>
+                <div class="pi-fav-info">
+                    <div class="pi-fav-nombre">${m.nombre}</div>
+                    <div class="pi-fav-esp">${m.especialidad || ''}</div>
+                    <div class="pi-fav-centro">📍 ${centro.nombre || 'Consultorio'}</div>
+                </div>
+                <button class="pi-fav-cita-btn" onclick="event.stopPropagation();openModalSolicitarCita('${m.id}')">Cita →</button>
+            </div>`;
+        }).join('')}
+    </div>`;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   SECCIÓN: HISTORIAL DE CONSULTAS
+────────────────────────────────────────────────────────────────── */
+function _piRenderHistorialConsultas(uid) {
+    const cont = document.getElementById('pi-historial-consultas');
+    if (!cont) return;
+
+    const hoy = fechaHoy();
+    const pasadas = (appState.citas || [])
+        .filter(c => c.estado === 'atendida' || (c.fechaStr && c.fechaStr < hoy && c.estado !== 'cancelada'))
+        .sort((a, b) => (b.fechaStr || '').localeCompare(a.fechaStr || ''))
+        .slice(0, 5);
+
+    if (pasadas.length === 0) {
+        cont.innerHTML = `<div class="pi-empty-card"><div class="pi-empty-icon">📂</div><p class="pi-empty-msg">No hay consultas en tu historial aún.</p></div>`;
+        return;
+    }
+
+    cont.innerHTML = `<div class="pi-hist-list">
+        ${pasadas.map(c => {
+            const medico = _uGet(c.medicoId) || {};
+            const fechaBonita = c.fechaStr
+                ? new Date(c.fechaStr + 'T12:00:00').toLocaleDateString('es-DO', { day: '2-digit', month: 'short', year: 'numeric' })
+                : '—';
+            const estadoColor = c.estado === 'atendida' ? '#10b981' : '#94a3b8';
+            return `
+            <div class="pi-hist-item">
+                <div class="pi-hist-dot" style="background:${estadoColor}"></div>
+                <div class="pi-hist-content">
+                    <div class="pi-hist-top">
+                        <span class="pi-hist-medico">${medico.nombre || 'Médico'}</span>
+                        <span class="pi-hist-fecha">${fechaBonita}</span>
+                    </div>
+                    <div class="pi-hist-esp">${medico.especialidad || 'Consulta General'}</div>
+                    ${c.motivoConsulta ? `<div class="pi-hist-motivo">📝 ${c.motivoConsulta}</div>` : ''}
+                </div>
+                <button class="pi-hist-ver" onclick="_piVerDetalleCita('${c.id}')">→</button>
+            </div>`;
+        }).join('')}
+    </div>`;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   SECCIÓN: RESUMEN HISTORIAL MÉDICO (diagnósticos de historias_clinicas)
+────────────────────────────────────────────────────────────────── */
+async function _piRenderHistorialMedico(uid) {
+    const cont = document.getElementById('pi-historial-medico');
+    if (!cont) return;
+
+    try {
+        // Buscar notas clínicas donde el paciente es el target
+        const snap = await db.collection('historias_clinicas')
+            .where('pacienteId', '==', uid)
+            .orderBy('fecha', 'desc')
+            .limit(5)
+            .get();
+
+        let notas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        if (notas.length === 0) {
+            // Fallback: buscar por uid alternativo (algunos sistemas guardan como 'uid')
+            try {
+                const snap2 = await db.collection('historias_clinicas')
+                    .where('uid', '==', uid).limit(5).get();
+                notas = snap2.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => (b.fecha?.seconds || 0) - (a.fecha?.seconds || 0));
+            } catch(e2) {}
+        }
+
+        if (notas.length === 0) {
+            cont.innerHTML = `<div class="pi-empty-card"><div class="pi-empty-icon">📋</div><p class="pi-empty-msg">No hay diagnósticos registrados aún.</p></div>`;
+            return;
+        }
+
+        cont.innerHTML = `<div class="pi-dx-list">
+            ${notas.map(n => {
+                let fechaStr = '—';
+                try {
+                    const d = n.fecha?.toDate ? n.fecha.toDate() : (n.fecha?.seconds ? new Date(n.fecha.seconds * 1000) : new Date(n.fecha));
+                    fechaStr = d.toLocaleDateString('es-DO', { day: '2-digit', month: 'short', year: 'numeric' });
+                } catch(e) {}
+                const medico = _uGet(n.medicoId) || {};
+                const dx = n.diagnostico || n.ex_diagnostico || n.ped_diagnostico || n.nut_diagnostico || 'Sin diagnóstico registrado';
+                return `
+                <div class="pi-dx-item">
+                    <div class="pi-dx-icon">📋</div>
+                    <div class="pi-dx-content">
+                        <div class="pi-dx-top">
+                            <span class="pi-dx-medico">${medico.nombre || n.nombreMedico || 'Médico'}</span>
+                            <span class="pi-dx-fecha">${fechaStr}</span>
+                        </div>
+                        ${medico.especialidad || n.especialidad ? `<div class="pi-dx-esp">${medico.especialidad || n.especialidad}</div>` : ''}
+                        <div class="pi-dx-dx">DX: ${dx}</div>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>`;
+    } catch(e) {
+        // Si no tiene índice, intento sin orderBy
+        try {
+            const snap = await db.collection('historias_clinicas')
+                .where('pacienteId', '==', uid).limit(5).get();
+            const notas = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a, b) => (b.fecha?.seconds || 0) - (a.fecha?.seconds || 0));
+            if (notas.length === 0) {
+                cont.innerHTML = `<div class="pi-empty-card"><div class="pi-empty-icon">📋</div><p class="pi-empty-msg">No hay diagnósticos registrados aún.</p></div>`;
+                return;
+            }
+            cont.innerHTML = `<div class="pi-dx-list">
+                ${notas.map(n => {
+                    let fechaStr = '—';
+                    try {
+                        const d = n.fecha?.toDate ? n.fecha.toDate() : (n.fecha?.seconds ? new Date(n.fecha.seconds * 1000) : new Date(n.fecha));
+                        fechaStr = d.toLocaleDateString('es-DO', { day: '2-digit', month: 'short', year: 'numeric' });
+                    } catch(e) {}
+                    const medico = _uGet(n.medicoId) || {};
+                    const dx = n.diagnostico || n.ex_diagnostico || 'Sin diagnóstico registrado';
+                    return `<div class="pi-dx-item"><div class="pi-dx-icon">📋</div><div class="pi-dx-content"><div class="pi-dx-top"><span class="pi-dx-medico">${medico.nombre || 'Médico'}</span><span class="pi-dx-fecha">${fechaStr}</span></div><div class="pi-dx-dx">DX: ${dx}</div></div></div>`;
+                }).join('')}
+            </div>`;
+        } catch(e2) {
+            cont.innerHTML = `<div class="pi-empty-card"><div class="pi-empty-icon">📋</div><p class="pi-empty-msg">No hay diagnósticos disponibles.</p></div>`;
+        }
+    }
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   SECCIÓN: RECETAS DIGITALES
+────────────────────────────────────────────────────────────────── */
+async function _piRenderRecetas(uid) {
+    const cont = document.getElementById('pi-recetas');
+    if (!cont) return;
+
+    try {
+        let recetas = [];
+        try {
+            const snap = await db.collection('solicitudes_recetas')
+                .where('pacienteId', '==', uid)
+                .orderBy('fechaEmision', 'desc')
+                .limit(5).get();
+            recetas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        } catch(e) {
+            const snap = await db.collection('solicitudes_recetas')
+                .where('pacienteId', '==', uid).limit(5).get();
+            recetas = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a, b) => (b.fechaEmision?.seconds || 0) - (a.fechaEmision?.seconds || 0));
+        }
+
+        if (recetas.length === 0) {
+            cont.innerHTML = `<div class="pi-empty-card"><div class="pi-empty-icon">💊</div><p class="pi-empty-msg">No tienes recetas digitales registradas aún.</p></div>`;
+            return;
+        }
+
+        cont.innerHTML = `<div class="pi-rec-list">
+            ${recetas.map(r => {
+                let fechaStr = '—';
+                try {
+                    const d = r.fechaEmision?.toDate ? r.fechaEmision.toDate() : (r.fechaEmision?.seconds ? new Date(r.fechaEmision.seconds * 1000) : new Date(r.fecha || Date.now()));
+                    fechaStr = d.toLocaleDateString('es-DO', { day: '2-digit', month: 'short', year: 'numeric' });
+                } catch(e) { fechaStr = r.fecha || '—'; }
+
+                const meds = (r.medicamentos || []);
+                const medResumen = meds.slice(0, 3).map(m => `<span class="pi-pill">${m.nombre || m.medicamento || m}</span>`).join('');
+                const extraMeds = meds.length > 3 ? `<span class="pi-pill pi-pill-more">+${meds.length - 3} más</span>` : '';
+                const revocada = r.revocada || r.estado === 'revocada';
+
+                return `
+                <div class="pi-rec-card ${revocada ? 'pi-rec-revocada' : ''}">
+                    <div class="pi-rec-header">
+                        <div>
+                            <div class="pi-rec-medico">💊 ${r.nombreMedico || 'Médico'}</div>
+                            <div class="pi-rec-fecha">📅 ${fechaStr}</div>
+                            ${r.diagnostico ? `<div class="pi-rec-dx">DX: ${r.diagnostico}</div>` : ''}
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+                            ${revocada ? '<span class="pi-badge-revocada">REVOCADA</span>' : '<span class="pi-badge-activa">ACTIVA</span>'}
+                        </div>
+                    </div>
+                    <div class="pi-rec-meds">${medResumen}${extraMeds}</div>
+                    ${!revocada ? `
+                    <div class="pi-rec-actions">
+                        <button class="pi-rec-btn" onclick="window._verDetalleReceta && window._verDetalleReceta('${r.id}')">
+                            🖨️ Ver / Imprimir
+                        </button>
+                    </div>` : ''}
+                </div>`;
+            }).join('')}
+        </div>`;
+    } catch(e) {
+        cont.innerHTML = `<div class="pi-empty-card"><div class="pi-empty-icon">💊</div><p class="pi-empty-msg">No se pudieron cargar las recetas.</p></div>`;
+    }
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   SECCIÓN: ESTUDIOS & ANALÍTICAS
+────────────────────────────────────────────────────────────────── */
+async function _piRenderEstudios(uid) {
+    const cont = document.getElementById('pi-estudios');
+    if (!cont) return;
+
+    try {
+        // Cargar analíticas y estudios en paralelo
+        let analiticas = [], estudios = [];
+
+        const queryFallback = async (collection, field, value) => {
+            try {
+                const s = await db.collection(collection)
+                    .where(field, '==', value)
+                    .orderBy('fechaEmision', 'desc')
+                    .limit(5).get();
+                return s.docs.map(d => ({ id: d.id, tipo: collection, ...d.data() }));
+            } catch(e) {
+                const s2 = await db.collection(collection)
+                    .where(field, '==', value).limit(5).get();
+                return s2.docs.map(d => ({ id: d.id, tipo: collection, ...d.data() }))
+                    .sort((a, b) => (b.fechaEmision?.seconds || 0) - (a.fechaEmision?.seconds || 0));
+            }
+        };
+
+        [analiticas, estudios] = await Promise.all([
+            queryFallback('solicitudes_analiticas', 'pacienteId', uid).catch(() => []),
+            queryFallback('solicitudes_estudios', 'pacienteId', uid).catch(() => [])
+        ]);
+
+        // Mezclar y ordenar por fecha desc
+        const todos = [...analiticas, ...estudios].sort((a, b) => {
+            const fa = a.fechaEmision?.seconds || a.creadoEn?.seconds || 0;
+            const fb = b.fechaEmision?.seconds || b.creadoEn?.seconds || 0;
+            return fb - fa;
+        }).slice(0, 6);
+
+        if (todos.length === 0) {
+            cont.innerHTML = `<div class="pi-empty-card"><div class="pi-empty-icon">🔬</div><p class="pi-empty-msg">No tienes estudios ni analíticas registradas aún.</p></div>`;
+            return;
+        }
+
+        cont.innerHTML = `<div class="pi-est-list">
+            ${todos.map(item => {
+                const esAnalitica = item.tipo === 'solicitudes_analiticas';
+                let fechaStr = '—';
+                try {
+                    const sec = item.fechaEmision?.seconds || item.creadoEn?.seconds;
+                    const d = sec ? new Date(sec * 1000) : (item.fechaEmision?.toDate ? item.fechaEmision.toDate() : new Date());
+                    fechaStr = d.toLocaleDateString('es-DO', { day: '2-digit', month: 'short', year: 'numeric' });
+                } catch(e) {}
+
+                const medico = _uGet(item.medicoId) || {};
+
+                // Resumen de analíticas
+                let resumen = '';
+                if (esAnalitica) {
+                    const cats = Object.entries(item.analiticas || {}).filter(([, v]) => v?.length > 0);
+                    const mostrar = cats.slice(0, 3).map(([cat, items]) => `${cat} (${items.length})`).join(', ');
+                    const extra = cats.length > 3 ? ` ... +${cats.length - 3} más` : '';
+                    resumen = mostrar + extra;
+                } else {
+                    // Estudios
+                    const imgs = item.estudios || item.imagenesIndicadas || [];
+                    const mostrar = (Array.isArray(imgs) ? imgs : Object.values(imgs || {}))
+                        .slice(0, 3).join(', ');
+                    const totalImgs = Array.isArray(imgs) ? imgs.length : Object.values(imgs || {}).length;
+                    const extra = totalImgs > 3 ? ` ... +${totalImgs - 3} más` : '';
+                    resumen = mostrar + extra;
+                }
+
+                const icon = esAnalitica ? '🧪' : '🔬';
+                const label = esAnalitica ? 'Analítica' : 'Estudio';
+                const labelBg = esAnalitica ? '#fef3c7' : '#ede9fe';
+                const labelColor = esAnalitica ? '#92400e' : '#5b21b6';
+                const verFn = esAnalitica
+                    ? `window.verDetalleSolicitud && window.verDetalleSolicitud('${item.id}')`
+                    : `window._verDetalleEstudio && window._verDetalleEstudio('${item.id}')`;
+                const printFn = esAnalitica
+                    ? `window.verDetalleSolicitud && window.verDetalleSolicitud('${item.id}')`
+                    : `window._reimprimirEstudio && window._reimprimirEstudio('${item.id}')`;
+
+                return `
+                <div class="pi-est-card">
+                    <div class="pi-est-header">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:20px;">${icon}</span>
+                            <div>
+                                <span class="pi-est-tipo" style="background:${labelBg};color:${labelColor}">${label}</span>
+                                <div class="pi-est-medico">${medico.nombre || item.nombreMedico || 'Médico'}</div>
+                            </div>
+                        </div>
+                        <span class="pi-est-fecha">${fechaStr}</span>
+                    </div>
+                    ${medico.especialidad || item.especialidad ? `<div class="pi-est-esp">${medico.especialidad || item.especialidad}</div>` : ''}
+                    ${item.diagnostico ? `<div class="pi-est-dx">DX: ${item.diagnostico}</div>` : ''}
+                    ${resumen ? `<div class="pi-est-resumen">${resumen}</div>` : ''}
+                    <div class="pi-est-actions">
+                        <button class="pi-est-btn pi-est-btn-ver" onclick="${verFn}">🔎 Ver Detalle</button>
+                        <button class="pi-est-btn pi-est-btn-print" onclick="${printFn}">🖨️ Imprimir</button>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>`;
+    } catch(e) {
+        cont.innerHTML = `<div class="pi-empty-card"><div class="pi-empty-icon">🔬</div><p class="pi-empty-msg">No se pudieron cargar los estudios.</p></div>`;
+    }
+}
+
+/* ── Limpiar timer de ads al cambiar de vista ── */
+const _origNavigateTo = window.navigateTo;
+if (_origNavigateTo && !window._piNavPatched) {
+    window._piNavPatched = true;
+    const _piNavOrig = navigateTo;
+    window.navigateTo = function(view) {
+        if (view !== 'inicio' && window._piAdsTimer) {
+            clearInterval(window._piAdsTimer);
+            window._piAdsTimer = null;
+        }
+        _piNavOrig(view);
+    };
+}
