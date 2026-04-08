@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════
-   KURADOC — NAVBAR GLOBAL
+   KURADOC — NAVBAR GLOBAL ESTILOS
    Compartido por index.html y todas las páginas
    ══════════════════════════════════════════════ */
 
@@ -10,7 +10,7 @@
   --k-blue: #0a5cf5;
   --k-blue-dark: #0847c8;
   --k-blue-light: #e8f0fe;
-  --k-navy: #0b1f3a;
+  --k-navy: #647995;
   --k-teal: #00c4a0;
   --k-text: #1a2540;
   --k-muted: #607080;
@@ -25,7 +25,7 @@
   position: fixed;
   top: 0; left: 0; right: 0;
   height: var(--nav-h);
-  background: rgb(16 17 26);
+  background: #062939;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--k-border);
@@ -121,8 +121,8 @@
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 580;
-  color: #e2e2e2;
-  background: linear-gradient(135deg, #153674, #0d437ede);
+  color: #3b3a3a;
+  background: linear-gradient(135deg, #ccdeff, #e0efffde);
   border: none;
   padding: 9px 20px;
   border-radius: 10px;
@@ -158,10 +158,11 @@
 
 /* ── Mobile menu ── */
 .kd-mobile-menu {
+  border-radius: 0px 0px 23px 30px;
   display: none;
   position: fixed;
   top: var(--nav-h); left: 0; right: 0;
-  background: white;
+  background: #f5f5f5;
   border-bottom: 1px solid var(--k-border);
   padding: 16px 24px 20px;
   box-shadow: 0 12px 40px rgba(0,0,0,.1);
@@ -176,6 +177,7 @@
 }
 .kd-mobile-menu.open { display: flex; }
 .kd-mobile-menu a {
+      border: 1px solid #e7e4e4;
   font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 500;
