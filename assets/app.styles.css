@@ -9,7 +9,7 @@
       .filtroAgendas {display: flex; gap: 8px; flex-wrap: wrap;}
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f3f4f6; color: #1f2937; }
+        body { margin: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f3f4f6; color: #1f2937; }
         .hidden { display: none !important; }
 
         @keyframes fadeInDown {
@@ -144,12 +144,18 @@ body.sidebar-open #sidebar-overlay { opacity: 1; visibility: visible; pointer-ev
     top: 0;
     bottom: 0;
     width: var(--sidebar-w);
-    height: 100vh;
+    /* ── Viewport moderno: fallback → svh → dvh ── */
+    height: 100vh;           /* fallback navegadores legacy        */
+    height: 100svh;          /* Small Viewport Height: excluye UI  */
+    height: 100dvh;          /* Dynamic: se ajusta al scroll del   */
+                             /* navegador en tiempo real (iOS/Android) */
     background: #142535;
     color: white;
     display: flex;
     flex-direction: column;
     padding: 4px 20px;
+    /* Safe area top para notch/isla dinámica */
+    padding-top: max(4px, env(safe-area-inset-top, 4px));
     z-index: 1100;
     border-right: 1px solid rgba(255,255,255,0.1);
     box-shadow: 4px 0 10px rgba(0,0,0,0.05);
@@ -174,30 +180,35 @@ body.sidebar-open #sidebar-overlay { opacity: 1; visibility: visible; pointer-ev
     align-items: flex-start;
 }
 
-@media (max-width: 640px)  {
-#hamburger-btn {
-    display: none;
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    z-index: 1200;
-    width: 100%;
-    height: 40px;
-    background: #142535;
-    border: none;
-    border-radius: 0px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 5px;
-    padding: 9px 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, .25);
-    transition: background .2s;
-          }
- 
-
-       }
+/* Hamburger en móvil — regla única y definitiva */
+@media (max-width: 640px) {
+    #hamburger-btn {
+        display: flex;               /* visible y activo en móvil  */
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1200;
+        width: 100%;
+        height: 44px;                /* ligeramente más alto para   */
+                                     /* respetar safe-area en iPhone */
+        /* Respeta el notch/isla dinámica en iOS */
+        height: calc(44px + env(safe-area-inset-top, 0px));
+        background: #fafafa !important;
+        border: none;
+        border-radius: 0;
+        cursor: pointer;
+        align-items: flex-start;
+        justify-content: center;
+        padding-left: 24px;
+        /* Empuja contenido por debajo del notch */
+        padding-top: env(safe-area-inset-top, 0px);
+        gap: 5px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.25);
+        transition: background .2s;
+        flex-direction: column;
+        align-content: flex-start
+    }
+}
 
 /* Ajuste de los botones/links */
 .app-header .nav-link, .app-header button {
@@ -378,13 +389,14 @@ Specificity: (0,2,0)
 
 /* ── MOBILE: sidebar completamente fuera de pantalla ─────────── */
 @media (max-width: 640px) {
-    #hamburger-btn { display: flex; align-items: flex-start; padding-left: 25px; background: #f4f4f4 !important; }
-    /* El overlay usa visibility/opacity — activo con body.sidebar-open */
+    #hamburger-btn { display: flex; }          /* ya definido arriba, refuerzo */
 
     .app-header {
         width: var(--sidebar-w);
         transform: translateX(calc(-1 * var(--sidebar-w)));
         padding: 3px 20px 57px;
+        /* Safe area superior para notch */
+        padding-top: max(3px, env(safe-area-inset-top, 3px));
     }
     body.sidebar-open .app-header {
         transform: translateX(0);
@@ -393,12 +405,39 @@ Specificity: (0,2,0)
     .main-content {
         margin-left: 0 !important;
         max-width: 100% !important;
-        padding: 12px !important;
-        padding-top: 60px !important;
-        padding-bottom: 24px !important;
+
+        /* ── Padding superior: barra hamburguesa (44px) + safe-area notch ── */
+        padding-top: calc(
+            54px
+            + env(safe-area-inset-top, 0px)
+        ) !important;
+
+        /* ── Padding inferior: nav (58px) + safe-area home indicator iOS ── */
+        padding-bottom: calc(
+            58px
+            + env(safe-area-inset-bottom, 0px)
+        ) !important;
+
+        padding-left: 12px !important;
+        padding-right: 12px !important;
     }
-    /* Ocultar nav inferior en mobile — se usa la nav del sidebar */
-    .mobile-nav { display: none !important; }
+
+    /* ── Nav inferior ACTIVA en móvil para el rol paciente ──────────
+       El paciente NO usa el sidebar como nav principal; su nav
+       inferior (mobileNav) es la única forma de navegar en móvil.
+       Para médico/admin el sidebar ya tiene el menú → se oculta.
+    ── */
+    .mobile-nav {
+        /* Por defecto oculta — se activa solo si body tiene el rol */
+        display: none;
+    }
+    body.rol-paciente .mobile-nav,
+    body[data-rol="paciente"] .mobile-nav {
+        display: flex !important;
+        left: 0 !important;     /* ocupa todo el ancho en móvil     */
+        /* Respeta el home indicator de iPhone */
+        padding-bottom: env(safe-area-inset-bottom, 6px);
+    }
 
     #miniCalendar { display: none; }
 }
@@ -411,15 +450,27 @@ Specificity: (0,2,0)
         
         /* Main */
        .main-content { 
-    padding-bottom: 80px !important;
     margin-left: var(--sidebar-w);
     margin-right: 0 !important;
     max-width: calc(100% - var(--sidebar-w));
     padding: 16px;
-    min-height: 100vh;
-    background: #ffffffc7;
     padding-top: 6px;
+    padding-bottom: 80px !important;
+
+    /* ── Altura mínima con cascada de unidades modernas ──
+       1. 100vh    → fallback universal
+       2. 100svh   → Small Viewport Height: no incluye barras del navegador
+       3. 100dvh   → Dynamic: se recalcula cuando la barra aparece/desaparece
+    ── */
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
+
+    background: #ffffffc7;
     transition: margin-left .32s cubic-bezier(.4,0,.2,1), max-width .32s cubic-bezier(.4,0,.2,1);
+    /* Evitar desbordamiento horizontal en móvil */
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
         .page-title {color: #565656; margin-top: 8px;  font-size: 18px; font-weight: bold; margin-bottom: 8px; margin-left: 5px; }
         .page-header { flex-wrap: wrap; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
@@ -528,12 +579,18 @@ Specificity: (0,2,0)
     right: 0;
     background: white;
     border-top: 1px solid #e5e7eb;
-    padding: 1px 0;
+    /* ── Safe area iOS home indicator ── */
+    padding: 4px 0;
+    padding-bottom: max(4px, env(safe-area-inset-bottom, 4px));
     display: none;
     justify-content: space-around;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(0,0,0,.07);
+    z-index: 900;
     transition: left .32s cubic-bezier(.4,0,.2,1);
+    /* Altura mínima fija para que los botones sean tapables */
+    min-height: 54px;
+    /* Evitar que se corte con el safe-area inferior */
+    box-sizing: content-box;
 }
 
         /* ── Ocultar TODO el UI de la app mientras no hay sesión activa ── */
@@ -967,7 +1024,7 @@ Specificity: (0,2,0)
 
 /* SECCIÓN DERECHA */
 .login-card {
- height: 546px;
+ height: 83svh;
     flex: 1;
     max-width: 500px;
     padding: 40px;
@@ -1752,6 +1809,7 @@ Specificity: (0,2,0)
 }
 
 #profile-avatar-btn {
+   background: #fafafa;
     gap: 5px;
     width: 50px;
     height: 36px;
@@ -3176,24 +3234,32 @@ Specificity: (0,2,0)
 
 /* ── Contenedor principal ── */
 .pi-wrap {
-    max-width: 700px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 0 80px;
+    /* padding-bottom deja espacio para la nav inferior + safe-area */
+    padding: 0 0 calc(70px + env(safe-area-inset-bottom, 0px));
     display: flex;
     flex-direction: column;
     gap: 0;
+    /* Sin desbordamiento horizontal */
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 /* ── CABECERA DE BIENVENIDA ── */
 .pi-header {
     background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #1a6a8a 100%);
     border-radius: 0 0 24px 24px;
-    padding: 24px 20px 20px;
-    margin-bottom: 0;
+    /* Padding lateral para que el contenido no toque los bordes */
+    padding: 20px 18px 18px;
+    margin: 0 0 4px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: 12px;
+    /* Asegurar que no se desborde en pantallas muy pequeñas */
+    flex-wrap: wrap;
 }
 .pi-saludo {
     font-size: 11px;
@@ -4042,7 +4108,10 @@ Specificity: (0,2,0)
 
 /* ── RESPONSIVE ── */
 @media (max-width: 480px) {
-    .pi-header { padding: 20px 14px 16px; margin: 7px;}
+    .pi-header {
+        padding: 16px 14px 14px;
+        border-radius: 0 0 20px 20px;
+    }
     .pi-nombre { font-size: 17px; }
     .pi-qa-btn { min-width: 44px; padding: 3px 5px; }
     .pi-section { padding: 14px 12px 0; }
@@ -4051,6 +4120,14 @@ Specificity: (0,2,0)
     .pi-ad-titulo { font-size: 14px; }
     .pi-cita-medico { font-size: 14px; }
     .pi-fav-nombre { font-size: 13px; }
+
+    /* En móvil con nav inferior visible, compensar el espacio */
+    .pi-wrap {
+        padding-bottom: calc(
+            70px
+            + env(safe-area-inset-bottom, 0px)
+        );
+    }
 }
 @media (min-width: 700px) {
     .pi-wrap { padding-bottom: 40px; }
