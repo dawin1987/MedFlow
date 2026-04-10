@@ -392,6 +392,10 @@ function stopInactivityWatcher() {
                     document.getElementById('registerModal').classList.add('hidden');
                     document.getElementById('mainApp').classList.remove('hidden');
                     document.body.classList.remove('app-not-logged');
+                    // ── Marcar el rol en el body para CSS responsive ──
+                    document.body.dataset.rol = userData.rol || '';
+                    document.body.classList.remove('rol-paciente','rol-medico','rol-admin','rol-secretaria');
+                    if (userData.rol) document.body.classList.add('rol-' + userData.rol);
                     clearTimeout(_splashTimeout);
                     _splashStatus('¡Listo! Bienvenido');
                     _hideSplash();
@@ -17131,7 +17135,7 @@ window._ncRender = function() {
             </div>
 
             <!-- ROW 2: Narrativa ─────────────────────────────────── -->
-            <div style="text-align: justify;font-size:11px;color:#475569;line-height:1.1;margin:2px 0 3px;padding:2px 5px;background:white;border-radius:9px;border:1px solid ${accent}18;box-shadow:0 1px 4px rgba(0,0,0,.04);">
+            <div style="text-align: justify;font-size:12px;color:#475569;line-height:1.6;margin:5px 0 6px;padding:12px 15px;background:white;border-radius:16px;border:1px solid ${accent}18;box-shadow:0 1px 4px rgba(0,0,0,.04);">
                 Tiene una cita <span style="font-weight:800;color:${accent};text-transform:capitalize;">${estadoCita}</span> con el/la
                 <strong style="color:#0f172a;"> ${nombreMed}</strong>${especialidad ? `, <span style="color:#64748b;">especialista en <em>${especialidad}</em></span>` : ''}, para el
                 <strong style="color:#0f172a;text-transform:capitalize;">${fechaLabel}</strong>,
