@@ -5346,200 +5346,128 @@ async function renderMisCitas() {
         return;
     }
 
-    // Fecha de hoy en formato YYYY-MM-DD (para comparar con fechaStr)
     const hoy = fechaHoy();
 
-    // Ordenar: próximas primero (futuras desc), luego pasadas
     const citasOrdenadas = [...appState.citas].sort((a, b) => {
         const fa = a.fechaStr || ''; const fb = b.fechaStr || '';
-        // Futuras antes, dentro de cada grupo por fecha
         const aFutura = fa >= hoy; const bFutura = fb >= hoy;
         if (aFutura && !bFutura) return -1;
         if (!aFutura && bFutura) return 1;
         return aFutura ? fa.localeCompare(fb) : fb.localeCompare(fa);
     });
 
-    // Separar en grupos
+    // Próximas: fecha >= hoy Y no cancelada/atendida
     const proximas = citasOrdenadas.filter(c =>
         c.fechaStr >= hoy && c.estado !== 'atendida' && c.estado !== 'cancelada');
-    const historial = citasOrdenadas.filter(c =>
+
+    // Pasadas: fecha < hoy sin importar estado, o atendida/cancelada
+    const pasadas = citasOrdenadas.filter(c =>
         c.fechaStr < hoy || c.estado === 'atendida' || c.estado === 'cancelada');
 
+    // ── Tarjeta compacta móvil-first ─────────────────────────────
     const renderTarjeta = (c, esPasada) => {
-        const medico   = _uGet(c.medicoId);
-        const centro   = (appState.centrosMedicos||[]).find(x => x.id === medico?.centroMedicoId);
-        let fechaKey   = c.fechaStr || '';
-        let fechaBonita = fechaKey
+        const medico      = _uGet(c.medicoId);
+        const centro      = (appState.centrosMedicos||[]).find(x => x.id === medico?.centroMedicoId);
+        const fechaKey    = c.fechaStr || '';
+        const fechaBonita = fechaKey
             ? new Date(fechaKey + 'T12:00:00').toLocaleDateString('es-DO',
-                {weekday:'long',day:'2-digit',month:'long',year:'numeric'})
+                { weekday:'short', day:'2-digit', month:'short', year:'numeric' })
             : 'Sin fecha';
-
         const turnoDoc  = appState.turnos.find(t => t.id === c.medicoId);
         const posActual = turnoDoc ? (turnoDoc[fechaKey] || 0) : 0;
-        const creador   = _uGet(c.creadaPor);
-        const fuePorSec = c.creadaPor && c.creadaPor !== c.pacienteId;
-        const tanda     = c.tanda || '';
-        const tandaLabel= tanda.charAt(0).toUpperCase() + tanda.slice(1) || (c.horaInicio || '—');
+        const tanda     = c.tanda ? c.tanda.charAt(0).toUpperCase() + c.tanda.slice(1) : (c.horaInicio || '—');
         const confirmado= !!c.confirmadoPorPaciente;
+        const fuePorSec = c.creadaPor && c.creadaPor !== c.pacienteId;
+        const creador   = _uGet(c.creadaPor);
 
-        // Colores por estado
         const estadoInfo = {
-            pendiente:  { col:'#f59e0b', bg:'#fffbeb', border:'#fde68a',  badge:'badge-warning' },
-            confirmada: { col:'#2563eb', bg:'#eff6ff', border:'#bfdbfe',  badge:'badge-info'    },
-            atendida:   { col:'#10b981', bg:'#f0fdf4', border:'#86efac',  badge:'badge-success' },
-            cancelada:  { col:'#ef4444', bg:'#fef2f2', border:'#fecaca',  badge:'badge-danger'  },
-        }[c.estado] || { col:'#94a3b8', bg:'#f8fafc', border:'#e2e8f0', badge:'badge-warning' };
+            pendiente:  { col:'#f59e0b', bg:'#fffbeb', border:'#fde68a', txt:'Pendiente'  },
+            confirmada: { col:'#2563eb', bg:'#eff6ff', border:'#bfdbfe', txt:'Confirmada' },
+            atendida:   { col:'#10b981', bg:'#f0fdf4', border:'#86efac', txt:'Atendida'   },
+            cancelada:  { col:'#ef4444', bg:'#fef2f2', border:'#fecaca', txt:'Cancelada'  },
+        }[c.estado] || { col:'#94a3b8', bg:'#f8fafc', border:'#e2e8f0', txt:'Pendiente'  };
 
-        const accentLeft = esPasada ? '#94a3b8' : estadoInfo.col;
+        const accentColor = esPasada ? '#94a3b8' : estadoInfo.col;
+        const icono = esPasada
+            ? (c.estado === 'atendida' ? '✅' : c.estado === 'cancelada' ? '❌' : '🕐')
+            : '🩺';
 
         return `
-        <div style="margin-bottom:14px;border-radius:18px;overflow:hidden;
-                    border:1.5px solid ${esPasada ? '#f1f5f9' : estadoInfo.border};
-                    box-shadow:0 2px 12px rgba(0,0,0,.06);
-                    background:${esPasada ? '#fafafa' : 'white'};
-                    ${esPasada ? 'opacity:.82;' : ''}">
-
-            <!-- Barra superior de acento -->
-            <div style="height:3px;background:linear-gradient(90deg,${accentLeft},${accentLeft}80,transparent);"></div>
-
-            <div style="padding:16px 18px;">
-
-                <!-- Fila 1: Doctor + Estado badge -->
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
-                    <div style="display:flex;align-items:center;gap:12px;">
-                        <div style="width:44px;height:44px;border-radius:14px;flex-shrink:0;
-                                    background:linear-gradient(135deg,${estadoInfo.bg},white);
-                                    border:1.5px solid ${estadoInfo.border};
-                                    display:flex;align-items:center;justify-content:center;font-size:20px;">
-                            ${esPasada ? (c.estado === 'atendida' ? '✅' : '❌') : '🩺'}
-                        </div>
-                        <div>
-                            <div style="font-size:15px;font-weight:800;color:#0f172a;letter-spacing:-.2px;">
-                                ${medico?.nombre || 'Médico'}
-                            </div>
-                            ${medico?.especialidad ? `<div style="font-size:11px;color:#64748b;margin-top:1px;">${medico.especialidad}</div>` : ''}
-                        </div>
+        <div class="mc-card ${esPasada ? 'mc-card-pasada' : ''}"
+             style="--mc-accent:${accentColor};--mc-border:${estadoInfo.border};">
+            <div class="mc-accent-bar"></div>
+            <div class="mc-body">
+                <div class="mc-top">
+                    <div class="mc-avatar" style="background:${estadoInfo.bg};border-color:${estadoInfo.border};">
+                        ${icono}
                     </div>
-                    <span class="badge ${estadoInfo.badge}" style="font-size:9px;flex-shrink:0;">
-                        ${(c.estado||'pendiente').toUpperCase()}
+                    <div class="mc-info">
+                        <div class="mc-medico">${medico?.nombre || 'Médico'}</div>
+                        ${medico?.especialidad ? `<div class="mc-esp">${medico.especialidad}</div>` : ''}
+                    </div>
+                    <span class="mc-badge" style="background:${estadoInfo.bg};color:${estadoInfo.col};border-color:${estadoInfo.border};">
+                        ${estadoInfo.txt}
                     </span>
                 </div>
-
-                <!-- Fila 2: Info chips -->
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:12px;">
-                    <div style="background:#f8fafc;border-radius:10px;padding:8px 11px;border:1px solid #f1f5f9;">
-                        <div style="font-size:8px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">📅 Fecha</div>
-                        <div style="font-size:11px;font-weight:700;color:#0f172a;text-transform:capitalize;line-height:1.3;">${fechaBonita}</div>
-                    </div>
-                    <div style="background:#f8fafc;border-radius:10px;padding:8px 11px;border:1px solid #f1f5f9;">
-                        <div style="font-size:8px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">🕐 Tanda</div>
-                        <div style="font-size:11px;font-weight:700;color:#0f172a;">${tandaLabel}</div>
-                    </div>
-                    <div style="background:#f8fafc;border-radius:10px;padding:8px 11px;border:1px solid #f1f5f9;">
-                        <div style="font-size:8px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">🎫 Turno</div>
-                        <div style="font-size:16px;font-weight:900;color:${estadoInfo.col};">#${c.ordenAtencion || c.numeroOrden || '—'}</div>
-                    </div>
-                    ${!esPasada && turnoDoc ? `
-                    <div style="background:#f0fdf4;border-radius:10px;padding:8px 11px;border:1px solid #86efac;">
-                        <div style="font-size:8px;font-weight:800;color:#15803d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">🟢 Turno actual</div>
-                        <div style="font-size:16px;font-weight:900;color:#059669;">#${posActual}</div>
-                    </div>` : ''}
+                <div class="mc-chips">
+                    <span class="mc-chip">📅 ${fechaBonita}</span>
+                    <span class="mc-chip">🕐 ${tanda}</span>
+                    <span class="mc-chip mc-chip-turno" style="color:${accentColor};">🎫 #${c.ordenAtencion || c.numeroOrden || '—'}</span>
+                    ${!esPasada && turnoDoc ? `<span class="mc-chip mc-chip-live">🟢 Actual #${posActual}</span>` : ''}
+                    ${centro ? `<span class="mc-chip">🏥 ${centro.nombre}</span>` : ''}
+                    ${fuePorSec ? `<span class="mc-chip mc-chip-sec">🖋️ ${creador?.nombre || 'Admin'}</span>` : ''}
                 </div>
-
-                ${centro ? `
-                <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#64748b;margin-bottom:10px;">
-                    🏥 <span>${centro.nombre}</span>
-                </div>` : ''}
-
-                ${fuePorSec ? `
-                <div style="font-size:10px;color:#6366f1;background:#eef2ff;padding:3px 9px;border-radius:20px;display:inline-flex;gap:4px;margin-bottom:10px;">
-                    🖋️ Agendada por: <strong>${creador?.nombre || 'Administración'}</strong>
-                </div>` : ''}
-
-                <!-- Fila 3: Costo + Acciones -->
-                <div style="display:flex;justify-content:space-between;align-items:center;
-                            padding-top:10px;border-top:1px dashed #f1f5f9;flex-wrap:wrap;gap:8px;">
-                    <div style="font-size:13px;">
-                        <span style="color:#64748b;">Total: </span>
-                        <strong style="color:#0f172a;">RD$ ${(c.costoFinal||0).toLocaleString()}</strong>
-                    </div>
-
-                    <!-- BOTONES — solo para citas futuras no terminadas -->
+                <div class="mc-footer">
+                    <span class="mc-costo">RD$ ${(c.costoFinal||0).toLocaleString()}</span>
                     ${!esPasada && c.estado !== 'cancelada' ? `
-                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-
+                    <div class="mc-actions">
                         ${!confirmado ? `
-                        <button onclick="_mcConfirmar('${c.id}')"
-                            style="display:inline-flex;align-items:center;gap:5px;
-                                background:linear-gradient(135deg,#059669,#047857);color:white;
-                                padding:7px 14px;border:none;border-radius:10px;cursor:pointer;
-                                font-size:11px;font-weight:700;
-                                box-shadow:0 3px 10px rgba(5,150,105,.25);transition:all .2s;"
-                            onmouseover="this.style.transform='translateY(-1px)'"
-                            onmouseout="this.style.transform=''">
-                            ✅ Confirmar asistencia
-                        </button>` : `
-                        <span style="display:inline-flex;align-items:center;gap:4px;
-                            background:#dcfce7;color:#15803d;border:1px solid #86efac;
-                            padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;">
-                            ✅ Asistencia confirmada
-                        </span>`}
-
-                        <button onclick="_mcCancelar('${c.id}')"
-                            style="display:inline-flex;align-items:center;gap:5px;
-                                background:#fef2f2;color:#dc2626;
-                                padding:7px 14px;border:1.5px solid #fca5a5;border-radius:10px;
-                                cursor:pointer;font-size:11px;font-weight:700;transition:all .2s;"
-                            onmouseover="this.style.background='#fee2e2'"
-                            onmouseout="this.style.background='#fef2f2'">
-                            ✕ Cancelar cita
-                        </button>
-                    </div>` : (esPasada ? `
-                    <span style="font-size:10px;color:#94a3b8;font-style:italic;">
-                        Solo la secretaria puede modificar esta cita
-                    </span>` : `
-                    <span style="display:inline-flex;align-items:center;gap:4px;
-                        background:#f1f5f9;color:#64748b;
-                        padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;">
-                        ❌ Cancelada
-                    </span>`)}
+                        <button class="mc-btn mc-btn-confirmar" onclick="_mcConfirmar('${c.id}')">✅ Confirmar</button>` : `
+                        <span class="mc-confirmed-tag">✅ Confirmada</span>`}
+                        <button class="mc-btn mc-btn-cancelar" onclick="_mcCancelar('${c.id}')">✕ Cancelar</button>
+                    </div>` : (esPasada && c.estado !== 'cancelada' && c.estado !== 'atendida' ? `
+                    <span class="mc-note">Solo secretaria puede modificar</span>` : '')}
                 </div>
             </div>
         </div>`;
     };
 
     mainContent.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-            <h1 class="page-title" style="margin:0;">Mis Citas</h1>
-            <div style="font-size:12px;color:#64748b;">
-                ${proximas.length} próxima${proximas.length!==1?'s':''} · ${historial.length} en historial
-            </div>
+    <div class="mc-wrap">
+        <div class="mc-header">
+            <h1 class="mc-title">📅 Mis Citas</h1>
+            <span class="mc-contador">${proximas.length} próx · ${pasadas.length} pasadas</span>
         </div>
-
-        ${citasOrdenadas.length === 0 ? `
-            <div style="text-align:center;padding:60px 20px;color:#94a3b8;">
-                <div style="font-size:48px;margin-bottom:12px;opacity:.4;">📭</div>
-                <p style="font-weight:700;font-size:15px;">No tienes citas programadas</p>
-                <p style="font-size:13px;">Busca un médico y agenda tu primera cita</p>
-            </div>` : `
-
-            ${proximas.length > 0 ? `
-            <div style="font-size:10px;font-weight:800;color:#2563eb;text-transform:uppercase;
-                        letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
-                <span style="width:6px;height:6px;border-radius:50%;background:#2563eb;display:inline-block;"></span>
-                Próximas (${proximas.length})
-            </div>
-            ${proximas.map(c => renderTarjeta(c, false)).join('')}` : ''}
-
-            ${historial.length > 0 ? `
-            <div style="font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;
-                        letter-spacing:.6px;margin:18px 0 10px;display:flex;align-items:center;gap:6px;">
-                <span style="width:6px;height:6px;border-radius:50%;background:#94a3b8;display:inline-block;"></span>
-                Historial (${historial.length})
-            </div>
-            ${historial.map(c => renderTarjeta(c, true)).join('')}` : ''}
-        `}
-    `;
+        <div class="mc-tabs">
+            <button class="mc-tab active" data-tab="proximas" onclick="_mcSetTab('proximas', this)">
+                <span class="mc-tab-icon">🔜</span>
+                <span>Próximas</span>
+                ${proximas.length > 0 ? `<span class="mc-tab-badge">${proximas.length}</span>` : ''}
+            </button>
+            <button class="mc-tab" data-tab="pasadas" onclick="_mcSetTab('pasadas', this)">
+                <span class="mc-tab-icon">🕐</span>
+                <span>Pasadas</span>
+                ${pasadas.length > 0 ? `<span class="mc-tab-badge mc-tab-badge-gray">${pasadas.length}</span>` : ''}
+            </button>
+        </div>
+        <div id="mc-panel-proximas" class="mc-panel">
+            ${proximas.length === 0 ? `
+            <div class="mc-empty">
+                <div class="mc-empty-icon">📭</div>
+                <p class="mc-empty-title">Sin citas próximas</p>
+                <p class="mc-empty-sub">Busca un médico y agenda tu próxima cita</p>
+                <button class="mc-empty-btn" onclick="navigateTo('agendas')">🔍 Buscar médico</button>
+            </div>` : proximas.map(c => renderTarjeta(c, false)).join('')}
+        </div>
+        <div id="mc-panel-pasadas" class="mc-panel" style="display:none;">
+            ${pasadas.length === 0 ? `
+            <div class="mc-empty">
+                <div class="mc-empty-icon">🗂️</div>
+                <p class="mc-empty-title">Sin citas anteriores</p>
+                <p class="mc-empty-sub">Tu historial de consultas aparecerá aquí</p>
+            </div>` : pasadas.map(c => renderTarjeta(c, true)).join('')}
+        </div>
+    </div>`;
 }
 
 // ── Confirmar asistencia desde Mis Citas ─────────────────────────
@@ -5551,9 +5479,8 @@ window._mcConfirmar = async function(citaId) {
             confirmadoPorPaciente:     true,
             fechaConfirmacionPaciente: firebase.firestore.FieldValue.serverTimestamp(),
         });
-        // El onSnapshot re-renderiza automáticamente
     } catch(e) {
-        if (btn) { btn.disabled = false; btn.textContent = '✅ Confirmar asistencia'; }
+        if (btn) { btn.disabled = false; btn.textContent = '✅ Confirmar'; }
         alert('❌ No se pudo confirmar: ' + e.message);
     }
 };
@@ -5571,10 +5498,29 @@ window._mcCancelar = async function(citaId) {
             canceladoPor:     'paciente',
             fechaCancelacion: firebase.firestore.FieldValue.serverTimestamp(),
         });
-        // onSnapshot actualizará la lista automáticamente
     } catch(e) {
         alert('❌ Error al cancelar: ' + e.message);
     }
+};
+
+// ── Switch tabs Próximas / Pasadas ────────────────────────────────
+window._mcSetTab = function(tab, btnEl) {
+    document.querySelectorAll('.mc-tab').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+    const pP = document.getElementById('mc-panel-proximas');
+    const pA = document.getElementById('mc-panel-pasadas');
+    if (!pP || !pA) return;
+    const show = tab === 'proximas' ? pP : pA;
+    const hide = tab === 'proximas' ? pA : pP;
+    hide.style.display   = 'none';
+    show.style.display   = '';
+    show.style.opacity   = '0';
+    show.style.transform = 'translateY(6px)';
+    requestAnimationFrame(() => {
+        show.style.transition = 'opacity .25s ease, transform .25s ease';
+        show.style.opacity    = '1';
+        show.style.transform  = 'translateY(0)';
+    });
 };        // UTILIDADES
         function showAlert(elementId, message, type = 'error') {
             const alertElement = document.getElementById(elementId);
@@ -19977,57 +19923,103 @@ window.renderInicioPaciente = async function() {
             </div>
         </section>
 
-        <!-- ── MIS MÉDICOS FAVORITOS ── -->
-        <section class="pi-section">
-            <div class="pi-section-header">
-                <h2 class="pi-section-title">❤️ Mis Médicos Favoritos</h2>
-                <button class="pi-ver-mas" onclick="navigateTo('favoritos')">Ver todos →</button>
-            </div>
-            <div id="pi-favoritos">
-                <div class="pi-loading">⏳ Cargando favoritos...</div>
-            </div>
-        </section>
-
-        <!-- ── HISTORIAL DE CONSULTAS ── -->
-        <section class="pi-section">
-            <div class="pi-section-header">
-                <h2 class="pi-section-title">🗂️ Historial de Consultas</h2>
-                <button class="pi-ver-mas" onclick="navigateTo('mis-citas')">Ver todas →</button>
-            </div>
-            <div id="pi-historial-consultas">
-                <div class="pi-loading">⏳ Cargando historial...</div>
-            </div>
-        </section>
-
-        <!-- ── RESUMEN HISTORIAL MÉDICO ── -->
-        <section class="pi-section">
-            <div class="pi-section-header">
-                <h2 class="pi-section-title">📋 Resumen Historial Médico</h2>
-            </div>
-            <div id="pi-historial-medico">
-                <div class="pi-loading">⏳ Cargando diagnósticos...</div>
+        <!-- ══ BARRA DE FILTROS ══ -->
+        <section class="pi-section" style="padding-bottom:4px;">
+            <div class="pi-filter-bar">
+                <button class="pi-filter-btn active" data-filter="todos"
+                        onclick="_piSetFilter('todos', this)">
+                    <span class="pi-filter-icon">✨</span>
+                    <span class="pi-filter-label">Todo</span>
+                </button>
+                <button class="pi-filter-btn" data-filter="historial"
+                        onclick="_piSetFilter('historial', this)">
+                    <span class="pi-filter-icon">🗂️</span>
+                    <span class="pi-filter-label">Historial</span>
+                </button>
+                <button class="pi-filter-btn" data-filter="recetas"
+                        onclick="_piSetFilter('recetas', this)">
+                    <span class="pi-filter-icon">💊</span>
+                    <span class="pi-filter-label">Recetas</span>
+                </button>
+                <button class="pi-filter-btn" data-filter="estudios"
+                        onclick="_piSetFilter('estudios', this)">
+                    <span class="pi-filter-icon">🔬</span>
+                    <span class="pi-filter-label">Estudios</span>
+                </button>
             </div>
         </section>
 
-        <!-- ── RECETAS DIGITALES ── -->
-        <section class="pi-section">
-            <div class="pi-section-header">
-                <h2 class="pi-section-title">💊 Recetas Digitales</h2>
-            </div>
-            <div id="pi-recetas">
-                <div class="pi-loading">⏳ Cargando recetas...</div>
-            </div>
-        </section>
+        <!-- ── PANEL FILTRABLE ── -->
+        <div id="pi-panel-filtrable">
 
-        <!-- ── ESTUDIOS & ANALÍTICAS ── -->
-        <section class="pi-section">
-            <div class="pi-section-header">
-                <h2 class="pi-section-title">🔬 Estudios & Analíticas</h2>
-            </div>
-            <div id="pi-estudios">
-                <div class="pi-loading">⏳ Cargando estudios...</div>
-            </div>
-        </section>
+            <!-- Médicos Favoritos: todos -->
+            <section class="pi-section pi-group pi-group-todos">
+                <div class="pi-section-header">
+                    <div class="pi-section-title-wrap">
+                        <span class="pi-section-icon-badge pi-badge-favs">❤️</span>
+                        <h2 class="pi-section-title">Mis Médicos Favoritos</h2>
+                    </div>
+                    <button class="pi-ver-mas" onclick="navigateTo('favoritos')">Ver todos →</button>
+                </div>
+                <div id="pi-favoritos">
+                    <div class="pi-loading">⏳ Cargando favoritos...</div>
+                </div>
+            </section>
+
+            <!-- Historial de Consultas: todos | historial -->
+            <section class="pi-section pi-group pi-group-todos pi-group-historial">
+                <div class="pi-section-header">
+                    <div class="pi-section-title-wrap">
+                        <span class="pi-section-icon-badge pi-badge-hist">🗂️</span>
+                        <h2 class="pi-section-title">Historial de Consultas</h2>
+                    </div>
+                    <button class="pi-ver-mas" onclick="navigateTo('mis-citas')">Ver todas →</button>
+                </div>
+                <div id="pi-historial-consultas">
+                    <div class="pi-loading">⏳ Cargando historial...</div>
+                </div>
+            </section>
+
+            <!-- Resumen Historial Médico: todos | historial -->
+            <section class="pi-section pi-group pi-group-todos pi-group-historial">
+                <div class="pi-section-header">
+                    <div class="pi-section-title-wrap">
+                        <span class="pi-section-icon-badge pi-badge-dx">📋</span>
+                        <h2 class="pi-section-title">Resumen Historial Médico</h2>
+                    </div>
+                </div>
+                <div id="pi-historial-medico">
+                    <div class="pi-loading">⏳ Cargando diagnósticos...</div>
+                </div>
+            </section>
+
+            <!-- Recetas Digitales: todos | recetas -->
+            <section class="pi-section pi-group pi-group-todos pi-group-recetas">
+                <div class="pi-section-header">
+                    <div class="pi-section-title-wrap">
+                        <span class="pi-section-icon-badge pi-badge-rec">💊</span>
+                        <h2 class="pi-section-title">Recetas Digitales</h2>
+                    </div>
+                </div>
+                <div id="pi-recetas">
+                    <div class="pi-loading">⏳ Cargando recetas...</div>
+                </div>
+            </section>
+
+            <!-- Estudios & Analíticas: todos | estudios -->
+            <section class="pi-section pi-group pi-group-todos pi-group-estudios">
+                <div class="pi-section-header">
+                    <div class="pi-section-title-wrap">
+                        <span class="pi-section-icon-badge pi-badge-est">🔬</span>
+                        <h2 class="pi-section-title">Estudios &amp; Analíticas</h2>
+                    </div>
+                </div>
+                <div id="pi-estudios">
+                    <div class="pi-loading">⏳ Cargando estudios...</div>
+                </div>
+            </section>
+
+        </div><!-- /pi-panel-filtrable -->
 
     </div>`;
 
@@ -20039,6 +20031,32 @@ window.renderInicioPaciente = async function() {
     _piRenderHistorialMedico(uid);
     _piRenderRecetas(uid);
     _piRenderEstudios(uid);
+};
+
+/* ──────────────────────────────────────────────────────────────────
+   SECCIÓN: FILTRO DE PANEL (pi-filter-bar)
+   Muestra/oculta secciones según el filtro seleccionado.
+   Uso: onclick="_piSetFilter('historial', this)"
+────────────────────────────────────────────────────────────────── */
+window._piSetFilter = function _piSetFilter(filter, btn) {
+    // 1. Actualizar estado activo de los botones
+    const bar = btn?.closest('.pi-filter-bar');
+    if (bar) {
+        bar.querySelectorAll('.pi-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // 2. Mostrar/ocultar secciones según el filtro
+    //    Cada sección lleva clases como: pi-group-todos, pi-group-historial, etc.
+    //    Si el filtro es 'todos' → mostrar todas las que tengan pi-group-todos
+    //    Si el filtro es 'historial' → mostrar sólo las que tengan pi-group-historial
+    const panel = document.getElementById('pi-panel-filtrable');
+    if (!panel) return;
+
+    panel.querySelectorAll('.pi-group').forEach(section => {
+        const visible = section.classList.contains(`pi-group-${filter}`);
+        section.style.display = visible ? '' : 'none';
+    });
 };
 
 /* ──────────────────────────────────────────────────────────────────
