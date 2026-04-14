@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Sistema de Gestión de Citas Médicas</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -73,8 +73,8 @@
             <div class="login-icon"><a href="index.html" class="kd-logo">
          <img src="img/logok.png" alt="KuraDoc" class="kd-logo-img">
               </a></div>
-            <h1 style="/* background: red; */ font-size: 21px;color: #1a91a6;">"Donde la Medicina fluye con tecnología"</h1>
-            <p class="login-subtitle">Inicia sesión para continuar</p>
+            <h1 style="/* background: red; */ font-size: 16px;color: #1a91a6;">Donde la Medicina fluye con tecnología</h1>
+            <p class="login-subtitle" style="margin-top: 12px;"> Inicia sesión para continuar</p>
  
         </div>
 
@@ -93,9 +93,7 @@
             <div class="form-group">
                 <div class="login-label-row">
                     <label class="form-label" for="loginPassword" style="margin-bottom:0;">Contraseña</label>
-                    <button type="button" class="forgot-link" onclick="_mostrarOlvideContrasena()">
-                        ¿Olvidaste tu contraseña?
-                    </button>
+                   
                 </div>
                 <div class="pwd-wrap">
                     <input type="password" class="form-input" id="loginPassword"
@@ -116,6 +114,13 @@
                         </svg>
                     </button>
                 </div>
+
+          <div class="login-label-row">
+                    
+                    <button type="button" class="forgot-link" onclick="_mostrarOlvideContrasena()" style="width: 100%;text-align: right; padding: 11px 1px 11px;">
+                        ¿Olvidaste tu contraseña?
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary" id="loginBtn"
@@ -125,12 +130,13 @@
             </button>
         </form>
 
-        <div style="text-align: center; margin-top: 16px;">
+        <div style="display: flex; text-align: center; margin-top: 16px; align-items: center; justify-content: center;"> 
+           <h1 style="font-weight: 500;   font-size: 14px;color: #484b4d;">¿No tienes una cuenta?</h1>
             <button type="button"
                 class="btn btn-secondary"
                 onclick="toggleRegistro()"
-                style="width: 100%;">
-                Crear Cuenta Nueva
+                style="    padding: 4px;color: #0041ffbd; background: none; border:none;">
+                Regístrate
             </button>
         </div>
     </div>
@@ -855,7 +861,14 @@
     </div>
   </div>
 </div>
-
+<footer class="kd-footer" style="padding: 13px 18px 68px 19px;">
+  <p>© 2026 KuraDoc · Todos los derechos reservados ·
+    <a href="terminos.html">Términos y Condiciones</a> ·
+    <a href="privacidad.html">Política de Privacidad</a>
+  </p>
+ <n> </n>
+ <n> </n>
+</footer>
 
 <!-- ── KuraDoc Navbar JS — se inicializa al final del DOM ── -->
 <script src="navbar.js"></script>
