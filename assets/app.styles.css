@@ -1024,7 +1024,7 @@ Specificity: (0,2,0)
 
 /* SECCIÓN DERECHA */
 .login-card {
- height: 83svh;
+ height: 85svh;
     flex: 1;
     max-width: 500px;
     padding: 40px;
@@ -4144,4 +4144,282 @@ Specificity: (0,2,0)
     }
     .pi-modal-overlay { align-items: center; padding: 20px; }
     .pi-modal-box { border-radius: 24px; max-height: 85vh; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SECCIÓN INICIO PACIENTE — Filtros pill tabs + badges de sección
+   © 2026 KuraDoc
+═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Título con badge de icono ── */
+.pi-section-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+.pi-section-icon-badge {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+}
+.pi-badge-favs { background: #fff1f2; }
+.pi-badge-hist { background: #eff6ff; }
+.pi-badge-dx   { background: #f0fdf4; }
+.pi-badge-rec  { background: #faf5ff; }
+.pi-badge-est  { background: #fefce8; }
+
+/* ── Barra de filtros ── */
+.pi-filter-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 3px 2px 4px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+     justify-content: space-between;
+}
+.pi-filter-bar::-webkit-scrollbar { display: none; }
+
+.pi-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 6px;
+    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all .22s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+.pi-filter-btn:hover {
+    border-color: #94a3b8;
+    background: #f8fafc;
+    color: #0f172a;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,.1);
+}
+.pi-filter-btn.active {
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 14px rgba(0,0,0,.18);
+    transform: translateY(-1px);
+}
+.pi-filter-btn[data-filter="todos"].active     { background: linear-gradient(135deg,#0f172a,#1e3a5f); }
+.pi-filter-btn[data-filter="historial"].active { background: linear-gradient(135deg,#1d4ed8,#2563eb); }
+.pi-filter-btn[data-filter="recetas"].active   { background: linear-gradient(135deg,#6d28d9,#7c3aed); }
+.pi-filter-btn[data-filter="estudios"].active  { background: linear-gradient(135deg,#0d9488,#0f766e); }
+.pi-filter-icon  { font-size: 15px; line-height: 1; }
+.pi-filter-label { letter-spacing: .1px; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MIS CITAS — Tarjetas compactas + tabs Próximas / Pasadas
+   © 2026 KuraDoc
+═══════════════════════════════════════════════════════════════════════ */
+
+.mc-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    width: 100%;
+    box-sizing: border-box;
+}
+.mc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+.mc-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -.3px;
+}
+.mc-contador {
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 600;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+/* ── Tabs ── */
+.mc-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    background: #f1f5f9;
+    border-radius: 14px;
+    padding: 4px;
+}
+.mc-tab {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 12px;
+    border-radius: 11px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .22s cubic-bezier(.4,0,.2,1);
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    white-space: nowrap;
+}
+.mc-tab:hover { color: #0f172a; background: rgba(255,255,255,.6); }
+.mc-tab.active { background: white; color: #0f172a; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+.mc-tab[data-tab="proximas"].active { color: #2563eb; }
+.mc-tab[data-tab="pasadas"].active  { color: #475569; }
+.mc-tab-icon { font-size: 14px; line-height: 1; }
+.mc-tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 20px;
+    background: #2563eb;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+}
+.mc-tab-badge-gray { background: #94a3b8; }
+
+/* ── Panel ── */
+.mc-panel { display: flex; flex-direction: column; gap: 10px; }
+
+/* ── Tarjeta ── */
+.mc-card {
+    display: flex;
+    border-radius: 16px;
+    border: 1.5px solid var(--mc-border, #e2e8f0);
+    background: white;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    transition: box-shadow .2s, transform .15s;
+    -webkit-tap-highlight-color: transparent;
+}
+.mc-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.1); transform: translateY(-1px); }
+.mc-card-pasada { background: #fafafa; opacity: .85; border-color: #f1f5f9 !important; }
+.mc-card-pasada:hover { opacity: 1; }
+
+.mc-accent-bar { width: 4px; flex-shrink: 0; background: var(--mc-accent, #94a3b8); }
+
+.mc-body {
+    flex: 1;
+    padding: 12px 14px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.mc-top { display: flex; align-items: flex-start; gap: 10px; }
+.mc-avatar {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border: 1.5px solid var(--mc-border, #e2e8f0);
+}
+.mc-info { flex: 1; min-width: 0; }
+.mc-medico {
+    font-size: 14px; font-weight: 800; color: #0f172a;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    letter-spacing: -.2px;
+}
+.mc-esp {
+    font-size: 11px; color: #64748b; margin-top: 1px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mc-badge {
+    font-size: 9px; font-weight: 800;
+    padding: 3px 8px; border-radius: 20px; border: 1px solid;
+    white-space: nowrap; flex-shrink: 0;
+    letter-spacing: .3px; text-transform: uppercase; align-self: flex-start;
+}
+/* ── Chips ── */
+.mc-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.mc-chip {
+    font-size: 10px; font-weight: 600; color: #475569;
+    background: #f8fafc; border: 1px solid #f1f5f9;
+    border-radius: 20px; padding: 3px 9px; white-space: nowrap;
+}
+.mc-chip-turno  { font-weight: 800; background: transparent; border-color: currentColor; opacity: .85; }
+.mc-chip-live   { background: #f0fdf4; border-color: #86efac; color: #15803d; font-weight: 700; }
+.mc-chip-sec    { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; }
+/* ── Footer ── */
+.mc-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; padding-top: 8px; border-top: 1px dashed #f1f5f9; flex-wrap: wrap;
+}
+.mc-costo { font-size: 12px; font-weight: 700; color: #374151; }
+.mc-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.mc-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 12px; border-radius: 9px; font-size: 11px; font-weight: 700;
+    cursor: pointer; transition: all .18s; border: none; outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.mc-btn-confirmar {
+    background: linear-gradient(135deg,#059669,#047857);
+    color: white; box-shadow: 0 2px 8px rgba(5,150,105,.25);
+}
+.mc-btn-confirmar:hover { opacity: .88; transform: translateY(-1px); }
+.mc-btn-cancelar { background: #fef2f2; color: #dc2626; border: 1.5px solid #fca5a5; }
+.mc-btn-cancelar:hover { background: #fee2e2; }
+.mc-confirmed-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #dcfce7; color: #15803d; border: 1px solid #86efac;
+    padding: 5px 10px; border-radius: 20px; font-size: 10px; font-weight: 700;
+}
+.mc-note { font-size: 10px; color: #94a3b8; font-style: italic; }
+/* ── Empty state ── */
+.mc-empty {
+    text-align: center; padding: 40px 20px;
+    background: #f8fafc; border: 1.5px dashed #e2e8f0; border-radius: 16px;
+}
+.mc-empty-icon  { font-size: 40px; margin-bottom: 10px; opacity: .5; }
+.mc-empty-title { font-size: 14px; font-weight: 800; color: #374151; margin: 0 0 4px; }
+.mc-empty-sub   { font-size: 12px; color: #94a3b8; margin: 0 0 14px; }
+.mc-empty-btn {
+    background: linear-gradient(135deg,#2563eb,#1d4ed8);
+    color: white; border: none; border-radius: 10px;
+    padding: 9px 20px; font-size: 13px; font-weight: 700;
+    cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,.28);
+    transition: opacity .2s, transform .15s;
+}
+.mc-empty-btn:hover { opacity: .9; transform: translateY(-1px); }
+/* ── Responsive ── */
+@media (max-width: 400px) {
+    .mc-body   { padding: 10px 12px; }
+    .mc-medico { font-size: 13px; }
+    .mc-tab    { font-size: 12px; padding: 8px 8px; gap: 4px; }
+    .mc-btn    { padding: 5px 10px; font-size: 10px; }
 }
